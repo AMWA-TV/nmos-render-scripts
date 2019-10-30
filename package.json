@@ -1,0 +1,13 @@
+{
+  "name": "nmos-doc-build-tools",
+  "version": "1.0.0",
+  "description": "Build tools for NMOS documentation",
+  "repository": "https://github.com/AMWA-TV/nmos-doc-build-tools",
+  "author": "Peter Brightwell <peter.brightwell@bbc.co.uk>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "jsonlint": "^1.6.3",
+    "raml2html": "^7.5.0",
+    "raml2html-nmos-theme": "file:./raml2html-nmos-theme"
+  }
+}
