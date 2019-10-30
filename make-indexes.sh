@@ -1,13 +1,12 @@
 #!/bin/bash
 
+. $(dirname ${BASH_SOURCE[0]})/get-config.sh
+
 set -o errexit
 
 # TODO: Move some of the common/looped code into functions (DRY)
 
 shopt -s nullglob
-
-# Set variables from _config.yml
-. ./get-config.sh
 
 # Text in this file will appear at the start of the top-level index
 INTRO=intro.md

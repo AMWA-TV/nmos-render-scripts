@@ -7,7 +7,7 @@ NAME=$2
 ALT_HREF=$3
 ALT_TEXT=$4
 
-LINT="${BASH_SOURCE[0]%/*}/node_modules/.bin/jsonlint -q"
+LINT="jsonlint -q"
 
 cat <<EOF
 ---
