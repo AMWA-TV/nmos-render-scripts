@@ -59,7 +59,12 @@ layout: default
 title: API $i
 ---
 EOF
-                    raml2html -p --theme raml2html-nmos-theme $i >> "$HTML_API"
+                    if grep -q '^#%RAML *0.8' $i; then
+                        echo "Warning: relabelling RAML 0.8 as 1.0"
+                        perl -pi.bak -e 's/^#%RAML *0\.8/#%RAML 1.0/' $i
+                    fi
+                    raml2html --theme raml2html-nmos-theme $i >> "$HTML_API"
+                    [ -e $i.bak ] && mv $i.bak $i # Otherwise next checkout will fail
                 done
                 mkdir "../../$target_dir/html-APIs"
                 mv *.html "../../$target_dir/html-APIs/"
