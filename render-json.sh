@@ -62,7 +62,14 @@ EOF
     {
         pathsToCollapse: [
             "properties.id"
-        ]
+        ],
+        sortPropertiesBy: function(a, b) {
+           if (a === "title") { return false; }
+           if (b === "title") { return true; }
+           if (a === "description") { return false; }
+           if (b === "description") { return true; }
+           return a > b;
+        }
     });
 document.getElementsByClassName("content")[0].appendChild(formatter.render());
 </script>
