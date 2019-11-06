@@ -64,10 +64,10 @@ EOF
             "properties.id"
         ],
         sortPropertiesBy: function(a, b) {
-           if (a === "title") { return false; }
-           if (b === "title") { return true; }
-           if (a === "description") { return false; }
-           if (b === "description") { return true; }
+           if (a === "title") { return -1; }
+           if (b === "title") { return 1; }
+           if (a === "description") { return -1; }
+           if (b === "description") { return 1; }
            return a > b;
         }
     });
