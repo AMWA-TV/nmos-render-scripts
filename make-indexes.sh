@@ -24,6 +24,7 @@ shopt -s nullglob
 
 # Text in this file will appear at the start of the top-level index
 INTRO=intro.md
+INTRO_COMMON=.scripts/intro_common.md
 
 # Filename for index in each dir
 INDEX=index.md
@@ -108,10 +109,15 @@ do_b_or_t tags release/tag
 
 echo "Making top level $INDEX"
 
+# Add build status badge
 CI_URL=${REPO_ADDRESS/github.com/travis-ci.com}
 echo -e "[![Build Status](${CI_URL}.svg)](${CI_URL})\n" > "$INDEX"
-sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g" "$INTRO" >> "$INDEX"
-echo >> "$INDEX"
+
+# Add introduction - spec-specfic and common
+echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n" >> "$INDEX"
+cat "$INTRO" >> "$INDEX"
+echo -e "\n\n---\n\n" >> "$INDEX"
+sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g" "$INTRO_COMMON" >> "$INDEX"
 
 # Add the default links at the top - correct the links while copying text
 if [ "$DEFAULT_TREE" ]; then
