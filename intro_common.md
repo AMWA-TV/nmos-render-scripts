@@ -2,7 +2,7 @@
 
 See [here](https://amwa-tv.github.io/nmos) for an overview of NMOS specifications.
 
-The formal (template) specification is provided in [this GitHub repository](%REPO_ADDRESS%). These pages provide supporting documentation and HTML renders of the APIs (which are specified in RAML and JSON Schema).
+The formal specification is provided in [this GitHub repository](%REPO_ADDRESS%). These pages provide supporting documentation and HTML renders of the APIs (which are specified in RAML and JSON Schema).
 
 The documentation and API links immediately below, and the links in the page heading, are for an example development branch. Links to [other releases (tags)](tags/) and [other branches](branches/) appear later in the page, or under "VERSIONS..." in the page heading.
 
