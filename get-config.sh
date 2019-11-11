@@ -11,6 +11,7 @@ else
     echo Getting config from $_CONFIG_YML
 fi
 
+AMWA_ID=$(awk '/amwa_id/ { print $2 }' $_CONFIG_YML)
 REPO_ADDRESS=https://github.com/AMWA-TV$(awk '/baseurl:/ { print $2 }' $_CONFIG_YML)
 DEFAULT_TREE=$(awk '/default_tree:/ { print $2 }' $_CONFIG_YML)
 SHOW_TAGS=$(awk '/show_tags:/ { print $2 }' $_CONFIG_YML)

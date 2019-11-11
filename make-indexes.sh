@@ -110,7 +110,7 @@ echo "Making top level $INDEX"
 
 CI_URL=${REPO_ADDRESS/github.com/travis-ci.com}
 echo -e "[![Build Status](${CI_URL}.svg)](${CI_URL})\n" > "$INDEX"
-cat "$INTRO" >> "$INDEX"
+sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g" "$INTRO" >> "$INDEX"
 echo >> "$INDEX"
 
 # Add the default links at the top - correct the links while copying text
