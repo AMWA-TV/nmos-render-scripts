@@ -20,7 +20,7 @@ PATH=$PWD/.scripts:$PWD/node_modules/.bin:$PATH
 
 . get-config.sh
 
-if [ ! -d node_modules/.bin ]; then
+if [[ "$AMWA_ID" =~ "IS-" && ! -d node_modules/.bin ]]; then
     echo "fatal: Cannot find build tools (have you done 'make build-tools?')"
     exit 1
 fi
