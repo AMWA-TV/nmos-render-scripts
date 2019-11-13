@@ -58,7 +58,11 @@ function do_b_or_t {
                         # Removing the top-level part of lower-level link texts
                         # that is the part up to the hyphen and following space
                         indent="  "
-                        linktext="${no_ext#* - }" 
+                        if [[ $no_ext =~ " - " ]]; then
+                            linktext="${no_ext#* - }"
+                        else
+                            linktext="${no_ext#* }" # no hyphen
+                        fi
                     fi
                     echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
                     echo "${indent}- [$linktext]($underscore_space_doc)" >> "$INDEX"
