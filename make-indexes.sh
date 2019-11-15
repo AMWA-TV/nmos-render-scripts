@@ -40,8 +40,8 @@ function do_b_or_t {
         echo "Making $dirname/$INDEX"
         cd "$dir"
 
-            # The top level nmos repo has docs in the main dir, not docs/
-            if [ "$AMWA_ID" == "NMOS" ]; then
+            # NMOS and BCP-* repos have docs in the main dir, not docs/
+            if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
                 for doc in *.md; do
                     if [[ "$doc" != "index.md" && "$doc" != "README.md" ]]; then
                         no_ext=${doc%%.md}
@@ -137,9 +137,12 @@ echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n" >> "$INDEX"
 cat "$INTRO" >> "$INDEX"
 echo -e "\n\n---\n\n" >> "$INDEX"
 
-if [ "$AMWA_ID" == "NMOS" ]; then
+if [[ "$AMWA_ID" == "NMOS" ]]; then
     # Just this heading for top-level NMOS repo
     echo "## General NMOS Documentation" >> "$INDEX"
+elif [[ "$AMWA_ID" =~ "BCP-" ]]; then
+    # BCP-* has list of recommendations
+    echo "## Recommendation(s)" >> "$INDEX"
 else
     # Common intro for specs
     sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g" "$INTRO_COMMON" >> "$INDEX"
@@ -151,8 +154,8 @@ if [ "$DEFAULT_TREE" ]; then
     sed "s:(:($DEFAULT_TREE/:" "$DEFAULT_TREE/$INDEX" >> "$INDEX"
 fi
 
-# Top level repo doesn't need the branch and tags indexes
-if [ "$AMWA_ID" != "NMOS" ]; then
+# NMOS and BCP-* repos don't have branch and tags indexes
+if [[ ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" =~ "BCP-" ]]; then
 
     # TODO: DRY on the following...
 

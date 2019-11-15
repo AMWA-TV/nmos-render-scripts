@@ -44,8 +44,8 @@ function process_file {
     # done
 }
 
-# The top level nmos repo has docs in the main dir, not docs/
-if [ "$AMWA_ID" == "NMOS" ]; then
+# NMOS and BCP-* repos have docs in the main dir, not docs/
+if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
     for file in {branches,tags}/*/*.md index.md; do
         process_file "$file"
     done
