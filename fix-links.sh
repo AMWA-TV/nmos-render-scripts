@@ -18,28 +18,41 @@ set -o errexit
 
 shopt -s nullglob
 
+. .scripts/get-config.sh
+
 echo "Fixing links in documents"
 
-for file in {branches,tags}/*/docs/*.md; do
-
+function process_file {
     # Change .raml links to .html and rename APIs folder
-    perl -pi -e 's:\.raml\):.html\):g; s:/APIs:/html-APIs:g;' "$file"
+    perl -pi -e 's:\.raml\):.html\):g; s:/APIs:/html-APIs:g;' "$1"
 
     # Change .json links to .html and use with-refs for schemas
-    perl -pi -e 's:\.json\):.html\):g; s:/html-APIs/schemas:/html-APIs/schemas/with-refs:g;' "$file"
+    perl -pi -e 's:\.json\):.html\):g; s:/html-APIs/schemas:/html-APIs/schemas/with-refs:g;' "$1"
 
     # Change %20 escaped spaces in links to understores
-    perl -ni -e '@parts = split /(\(.*?\.md\))/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$file"
+    perl -ni -e '@parts = split /(\(.*?\.md\))/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
 
     # Same but for reference links
-    perl -ni -e '@parts = split /(\]:.*?\.md)/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$file"
+    perl -ni -e '@parts = split /(\]:.*?\.md)/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
 
     # For other repos, link to documentation
-    perl -pi -e 's:github\.com/AMWA-TV/:amwa-tv.github.io/:gi;' "$file"
-done
+    perl -pi -e 's:github\.com/AMWA-TV/:amwa-tv.github.io/:gi;' "$1" 
 
-# Removing the unwanted "schemas/" in .html links due to raml2html v6 workaround
-# for file in {branches,tags}/*/html-APIs/*.html; do
-#     perl -pi -e 's:schemas/::g;' "$file"
-# done
+    # Removing the unwanted "schemas/" in .html links due to raml2html v6 workaround
+    # for file in {branches,tags}/*/html-APIs/*.html; do
+    #     perl -pi -e 's:schemas/::g;' "$file"
+    # done
+}
+
+# The top level nmos repo has docs in the main dir, not docs/
+if [ "$AMWA_ID" == "NMOS" ]; then
+    for file in {branches,tags}/*/*.md index.md; do
+        process_file "$file"
+    done
+else
+    for file in {branches,tags}/*/docs/*.md; do
+        process_file "$file"
+    done
+fi
+
     

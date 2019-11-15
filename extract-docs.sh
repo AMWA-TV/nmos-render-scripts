@@ -33,6 +33,12 @@ function extract {
     cd source-repo
         echo "Checking out $checkout..."
         git checkout "$checkout"
+
+        # The top level nmos repo has docs in the main dir, not docs/
+        if [ "$AMWA_ID" == "NMOS" ]; then
+            cp -r . "../$target_dir" 
+        fi
+
         if [ -d docs ]; then
             cp -r docs "../$target_dir"
         fi
