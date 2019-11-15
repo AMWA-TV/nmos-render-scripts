@@ -47,7 +47,7 @@ function do_b_or_t {
                         no_ext=${doc%%.md}
                         # Spaces causing problems so rename extracted docs to use underscore
                         underscore_space_doc="${doc// /_}"
-                        mv "$doc" "$underscore_space_doc"
+                        mv -n "$doc" "$underscore_space_doc"
                         linktext=${no_ext}
                         echo "- [$linktext]($underscore_space_doc)" >> "$INDEX"
                     fi
@@ -62,7 +62,7 @@ function do_b_or_t {
                     no_ext="${doc%%.md}"
                     # Spaces causing problems so rename extracted docs to use underscore
                     underscore_space_doc="${doc// /_}"
-                    mv "$doc" "$underscore_space_doc"
+                    mv -n "$doc" "$underscore_space_doc"
 
                     # Top level documents have numbers ending in '.0' or '.0.'
                     match_top_level='^docs/[1-9][0-9]*\.0\.? '
