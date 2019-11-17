@@ -28,16 +28,23 @@ fi
 function extract {
     checkout=$1
     target_dir=$2
-    echo "Extracting documentation from $checkout into $target_dir"
+    echo "Extracting $checkout into $target_dir"
     mkdir "$target_dir"
+
+    # NMOS and BCP-* repos have docs in the main dir, not docs/
+    if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
+        cd source-repo
+            git checkout "$checkout"
+            cp *.md "../$target_dir" 
+            cp -r images "../$target_dir" 
+        cd ..
+        return
+    fi
+
+    # Other repos have docs/, APIs/, examples/
     cd source-repo
-        echo "Checking out $checkout..."
         git checkout "$checkout"
 
-        # The top level nmos repo has docs in the main dir, not docs/
-        if [ "$AMWA_ID" == "NMOS" ]; then
-            cp -r . "../$target_dir" 
-        fi
 
         if [ -d docs ]; then
             cp -r docs "../$target_dir"
