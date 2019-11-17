@@ -45,7 +45,6 @@ function extract {
     cd source-repo
         git checkout "$checkout"
 
-
         if [ -d docs ]; then
             cp -r docs "../$target_dir"
         fi
