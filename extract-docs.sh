@@ -31,96 +31,100 @@ function extract {
     echo "Extracting $checkout into $target_dir"
     mkdir "$target_dir"
 
-    # NMOS and BCP-* repos have docs in the main dir, not docs/
-    if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
-        cd source-repo
-            git checkout "$checkout"
-            cp *.md "../$target_dir" 
-            cp -r images "../$target_dir" 
-        cd ..
-        return
-    fi
-
-    # Other repos have docs/, APIs/, examples/
     cd source-repo
         git checkout "$checkout"
 
-        if [ -d docs ]; then
-            cp -r docs "../$target_dir"
-        fi
-        if [ -d APIs ]; then
-            cd APIs
-                cd schemas
-                    mkdir with-refs resolved
-                    for i in *.json; do
-                        echo "Resolving schema references for $i"
-                        if ! resolve-schema.py $i > resolved/$i ; then
-                            echo "WARNING: Resolving failed: resolved/$i may include \$refs"
-                            cp $i resolved/$i
-                        fi
-                        mv $i with-refs/
-                        cp resolved/$i $i
-                    done
-                    cd ..
-                for i in *.raml; do
-                    HTML_API=${i%%.raml}.html
-                    echo "Generating $HTML_API from $i..."
-                    cat << EOF > "$HTML_API"
+        # NMOS* and BCP-* repos have docs in the main dir, not docs/
+        if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
+            cp *.md "../$target_dir"
+            if [ -d images ] ; then
+                cp -r images "../$target_dir" 
+            fi
+
+        # NMOS-PARAMETER-REGISTERS has individual dir for each register
+        elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+            cp -r common device-control-types device-types formats node-service-types tags transports "../$target_dir"
+
+        # Other repos have docs/, APIs/, examples/
+        else
+
+            if [ -d docs ]; then
+                cp -r docs "../$target_dir"
+            fi
+            if [ -d APIs ]; then
+                cd APIs
+                    cd schemas
+                        mkdir with-refs resolved
+                        for i in *.json; do
+                            echo "Resolving schema references for $i"
+                            if ! resolve-schema.py $i > resolved/$i ; then
+                                echo "WARNING: Resolving failed: resolved/$i may include \$refs"
+                                cp $i resolved/$i
+                            fi
+                            mv $i with-refs/
+                            cp resolved/$i $i
+                        done
+                        cd ..
+                    for i in *.raml; do
+                        HTML_API=${i%%.raml}.html
+                        echo "Generating $HTML_API from $i..."
+                        cat << EOF > "$HTML_API"
 ---
 layout: default
 title: API $i
 ---
 EOF
                     if grep -q '^#%RAML *0.8' $i; then
-                        echo "Warning: relabelling RAML 0.8 as 1.0"
-                        perl -pi.bak -e 's/^#%RAML *0\.8/#%RAML 1.0/' $i
-                    fi
-                    raml2html --theme raml2html-nmos-theme $i >> "$HTML_API"
-                    [ -e $i.bak ] && mv $i.bak $i # Otherwise next checkout will fail
-                done
-                mkdir "../../$target_dir/html-APIs"
-                mv *.html "../../$target_dir/html-APIs/"
-                cp ../../.scripts/json-formatter.js "../../$target_dir/html-APIs/"
+                            echo "Warning: relabelling RAML 0.8 as 1.0"
+                            perl -pi.bak -e 's/^#%RAML *0\.8/#%RAML 1.0/' $i
+                        fi
+                        raml2html --theme raml2html-nmos-theme $i >> "$HTML_API"
+                        [ -e $i.bak ] && mv $i.bak $i # Otherwise next checkout will fail
+                    done
+                    mkdir "../../$target_dir/html-APIs"
+                    mv *.html "../../$target_dir/html-APIs/"
+                    cp ../../.scripts/json-formatter.js "../../$target_dir/html-APIs/"
 
-                if [ -d schemas ]; then
-                    echo "Rendering with-refs schemas..."
-                    for i in schemas/with-refs/*.json; do
-                        HTML_SCHEMA=${i%%.json}.html
-                        # echo "Generating $HTML_SCHEMA from $i..."
-                        render-json.sh "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/with-refs/resolved}" "Resolve referenced schemas" > "$HTML_SCHEMA"
-                    done
-                    echo "Rendering resolved schemas..."
-                    for i in schemas/resolved/*.json; do
-                        HTML_SCHEMA=${i%%.json}.html
-                        # echo "Generating $HTML_SCHEMA from $i..."
-                        render-json.sh "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/resolved/with-refs}" "Show referenced schemas with \$ref" > "$HTML_SCHEMA"
-                    done
-                    echo "Moving schemas..."
-                    mkdir "../../$target_dir/html-APIs/schemas"
-                    mkdir "../../$target_dir/html-APIs/schemas/with-refs"
-                    cp ../../.scripts/json-formatter.js "../../$target_dir/html-APIs/schemas/with-refs"
-                    mv schemas/with-refs/*.html "../../$target_dir/html-APIs/schemas/with-refs"
-                    mkdir "../../$target_dir/html-APIs/schemas/resolved"
-                    cp ../../.scripts/json-formatter.js "../../$target_dir/html-APIs/schemas/resolved"
-                    mv schemas/resolved/*.html "../../$target_dir/html-APIs/schemas/resolved"
-                    echo "Tidying..."
-                    # Restore things how they were to ensure next checkout doesn't overwrite
-                    mv schemas/with-refs/*.json schemas/ 
-                    rm -rf schemas/with-refs schemas/resolved
-                fi
-                cd ..
-        fi
-        if [ -d examples ]; then
-            echo "Rendering examples..."
-            for i in examples/*.json; do
-               HTML_EXAMPLE=${i%%.json}.html 
-               # echo "Rendering $HTML_EXAMPLE from $i..." 
-               render-json.sh $i "Example ${i##*/}" >> "$HTML_EXAMPLE"
-            done
-            echo "Moving examples..."
-            mkdir "../$target_dir/examples"
-            mv examples/*.html "../$target_dir/examples"
-            cp ../.scripts/json-formatter.js "../$target_dir/examples"
+                    if [ -d schemas ]; then
+                        echo "Rendering with-refs schemas..."
+                        for i in schemas/with-refs/*.json; do
+                            HTML_SCHEMA=${i%%.json}.html
+                            # echo "Generating $HTML_SCHEMA from $i..."
+                            render-json.sh "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/with-refs/resolved}" "Resolve referenced schemas" > "$HTML_SCHEMA"
+                        done
+                        echo "Rendering resolved schemas..."
+                        for i in schemas/resolved/*.json; do
+                            HTML_SCHEMA=${i%%.json}.html
+                            # echo "Generating $HTML_SCHEMA from $i..."
+                            render-json.sh "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/resolved/with-refs}" "Show referenced schemas with \$ref" > "$HTML_SCHEMA"
+                        done
+                        echo "Moving schemas..."
+                        mkdir "../../$target_dir/html-APIs/schemas"
+                        mkdir "../../$target_dir/html-APIs/schemas/with-refs"
+                        cp ../../.scripts/json-formatter.js "../../$target_dir/html-APIs/schemas/with-refs"
+                        mv schemas/with-refs/*.html "../../$target_dir/html-APIs/schemas/with-refs"
+                        mkdir "../../$target_dir/html-APIs/schemas/resolved"
+                        cp ../../.scripts/json-formatter.js "../../$target_dir/html-APIs/schemas/resolved"
+                        mv schemas/resolved/*.html "../../$target_dir/html-APIs/schemas/resolved"
+                        echo "Tidying..."
+                        # Restore things how they were to ensure next checkout doesn't overwrite
+                        mv schemas/with-refs/*.json schemas/ 
+                        rm -rf schemas/with-refs schemas/resolved
+                    fi
+                    cd ..
+            fi
+            if [ -d examples ]; then
+                echo "Rendering examples..."
+                for i in examples/*.json; do
+                   HTML_EXAMPLE=${i%%.json}.html 
+                   # echo "Rendering $HTML_EXAMPLE from $i..." 
+                   render-json.sh $i "Example ${i##*/}" >> "$HTML_EXAMPLE"
+                done
+                echo "Moving examples..."
+                mkdir "../$target_dir/examples"
+                mv examples/*.html "../$target_dir/examples"
+                cp ../.scripts/json-formatter.js "../$target_dir/examples"
+            fi
         fi
     cd ..
 }

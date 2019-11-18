@@ -44,11 +44,19 @@ function process_file {
     # done
 }
 
-# NMOS and BCP-* repos have docs in the main dir, not docs/
+# NMOS* and BCP-* repos have docs in the main dir, not docs/
 if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
     for file in {branches,tags}/*/*.md index.md; do
         process_file "$file"
     done
+
+# NMOS-PARAMETER-REGISTERS has individual dir for each register
+elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+    for file in {branches,tags}/*/*/*.md index.md; do
+        process_file "$file"
+    done
+
+# Other repos have docs/, APIs/, examples/
 else
     for file in {branches,tags}/*/docs/*.md; do
         process_file "$file"

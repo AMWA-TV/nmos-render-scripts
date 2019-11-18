@@ -40,7 +40,9 @@ function do_b_or_t {
         echo "Making $dirname/$INDEX"
         cd "$dir"
 
-            # NMOS and BCP-* repos have docs in the main dir, not docs/
+            # NMOS* and BCP-* repos have docs in the main dir, not docs/
+            # TODO: NMOS-PAR... has additional folder structure to sort!
+
             if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
                 for doc in *.md; do
                     if [[ "$doc" != "index.md" && "$doc" != "README.md" ]]; then
@@ -52,70 +54,80 @@ function do_b_or_t {
                         echo "- [$linktext]($underscore_space_doc)" >> "$INDEX"
                     fi
                 done
-            fi
 
-            if [ -d docs ]; then
-                INDEX_DOCS="docs/$INDEX"
-                echo -e "\n## Documentation for $label $dirname\n" >> "$INDEX"
-                echo -e "## Documentation for $label $dirname\n" >> "$INDEX_DOCS"
-                for doc in docs/[1-9]*.md; do
-                    no_ext="${doc%%.md}"
-                    # Spaces causing problems so rename extracted docs to use underscore
-                    underscore_space_doc="${doc// /_}"
-                    [[ "$underscore_space_doc" != "$doc" ]] && mv "$doc" "$underscore_space_doc"
+            # NMOS-PARAMETER-REGISTERS has individual dir for each register
+            elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+                for i in common device-control-types device-types formats node-service-types tags transports; do
+                    echo "- [$i]($i)" >> "$INDEX"
+                done
 
-                    # Top level documents have numbers ending in '.0' or '.0.'
-                    match_top_level='^docs/[1-9][0-9]*\.0\.? '
-                    if [[ "$doc" =~ $match_top_level ]]; then
-                        indent=""
-                        linktext="${no_ext#* }"
-                    else
-                        # Removing the top-level part of lower-level link texts
-                        # that is the part up to the hyphen and following space
-                        indent="  "
-                        if [[ $no_ext =~ " - " ]]; then
-                            linktext="${no_ext#* - }"
+            # Other repos have docs/, APIs/, APIs/schemas/, examples/
+            else
+
+                if [ -d docs ]; then
+                    INDEX_DOCS="docs/$INDEX"
+                    echo -e "\n## Documentation for $label $dirname\n" >> "$INDEX"
+                    echo -e "## Documentation for $label $dirname\n" >> "$INDEX_DOCS"
+                    for doc in docs/[1-9]*.md; do
+                        no_ext="${doc%%.md}"
+                        # Spaces causing problems so rename extracted docs to use underscore
+                        underscore_space_doc="${doc// /_}"
+                        [[ "$underscore_space_doc" != "$doc" ]] && mv "$doc" "$underscore_space_doc"
+
+                        # Top level documents have numbers ending in '.0' or '.0.'
+                        match_top_level='^docs/[1-9][0-9]*\.0\.? '
+                        if [[ "$doc" =~ $match_top_level ]]; then
+                            indent=""
+                            linktext="${no_ext#* }"
                         else
-                            linktext="${no_ext#* }" # no hyphen
+                            # Removing the top-level part of lower-level link texts
+                            # that is the part up to the hyphen and following space
+                            indent="  "
+                            if [[ $no_ext =~ " - " ]]; then
+                                linktext="${no_ext#* - }"
+                            else
+                                linktext="${no_ext#* }" # no hyphen
+                            fi
                         fi
-                    fi
-                    echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
-                    echo "${indent}- [$linktext]($underscore_space_doc)" >> "$INDEX"
-                done
-            fi
+                        echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
+                        echo "${indent}- [$linktext]($underscore_space_doc)" >> "$INDEX"
+                    done
+                fi
 
-            if [ -d html-APIs ]; then
-                INDEX_APIS="html-APIs/$INDEX"
-                echo -e "\n## APIs for $label $dirname\n" >> "$INDEX"
-                echo -e "## APIs for $label $dirname\n" > "$INDEX_APIS"
-                for api in html-APIs/*.html; do
-                    no_ext="${api%%.html}"
-                    linktext="${no_ext##*/}"
-                    echo "- [$linktext](${api##*/})" >> "$INDEX_APIS"
-                    echo "- [$linktext]($api)" >> "$INDEX"
-                done
-            fi
+                if [ -d html-APIs ]; then
+                    INDEX_APIS="html-APIs/$INDEX"
+                    echo -e "\n## APIs for $label $dirname\n" >> "$INDEX"
+                    echo -e "## APIs for $label $dirname\n" > "$INDEX_APIS"
+                    for api in html-APIs/*.html; do
+                        no_ext="${api%%.html}"
+                        linktext="${no_ext##*/}"
+                        echo "- [$linktext](${api##*/})" >> "$INDEX_APIS"
+                        echo "- [$linktext]($api)" >> "$INDEX"
+                    done
+                fi
 
-            if [ -d html-APIs/schemas ]; then
-                INDEX_SCHEMAS="html-APIs/schemas/$INDEX"
-                echo -e "\n### [JSON Schemas](html-APIs/schemas/)\n" >> "$INDEX"
-                echo -e "## JSON Schemas for $label $dirname\n" > "$INDEX_SCHEMAS"
-                for schema in html-APIs/schemas/with-refs/*.html; do
-                    no_ext="${schema%%.html}"
-                    linktext="${no_ext##*/}"
-                    echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
-                done
-            fi
+                if [ -d html-APIs/schemas ]; then
+                    INDEX_SCHEMAS="html-APIs/schemas/$INDEX"
+                    echo -e "\n### [JSON Schemas](html-APIs/schemas/)\n" >> "$INDEX"
+                    echo -e "## JSON Schemas for $label $dirname\n" > "$INDEX_SCHEMAS"
+                    for schema in html-APIs/schemas/with-refs/*.html; do
+                        no_ext="${schema%%.html}"
+                        linktext="${no_ext##*/}"
+                        echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
+                    done
+                fi
 
-            if [ -d examples ]; then
-                INDEX_EXAMPLES="examples/$INDEX"
-                echo -e "\n### [Examples](examples/)\n" >> "$INDEX"
-                echo -e "## Examples for $label $dirname\n" > "$INDEX_EXAMPLES"
-                for example in examples/*.html; do
-                    no_ext="${example%%.html}"
-                    linktext="${no_ext##*/}"
-                    echo "- [$linktext](${example##*/})" >> "$INDEX_EXAMPLES"
-                done
+                if [ -d examples ]; then
+                    INDEX_EXAMPLES="examples/$INDEX"
+                    echo -e "\n### [Examples](examples/)\n" >> "$INDEX"
+                    echo -e "## Examples for $label $dirname\n" > "$INDEX_EXAMPLES"
+                    for example in examples/*.html; do
+                        no_ext="${example%%.html}"
+                        linktext="${no_ext##*/}"
+                        echo "- [$linktext](${example##*/})" >> "$INDEX_EXAMPLES"
+                    done
+                fi
+
             fi
 
             cd ..
@@ -137,12 +149,13 @@ echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n" >> "$INDEX"
 cat "$INTRO" >> "$INDEX"
 echo -e "\n\n---\n\n" >> "$INDEX"
 
+# Heading/intro depends on repo type
 if [[ "$AMWA_ID" == "NMOS" ]]; then
-    # Just this heading for top-level NMOS repo
     echo "## General NMOS Documentation" >> "$INDEX"
+elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+    echo "## Parameter Registers" >> "$INDEX"
 elif [[ "$AMWA_ID" =~ "BCP-" ]]; then
-    # BCP-* has list of recommendations
-    echo "## Recommendation(s)" >> "$INDEX"
+    echo "## Recommendations and related documentation" >> "$INDEX"
 else
     # Common intro for specs
     sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g" "$INTRO_COMMON" >> "$INDEX"
@@ -154,8 +167,8 @@ if [ "$DEFAULT_TREE" ]; then
     sed "s:(:($DEFAULT_TREE/:" "$DEFAULT_TREE/$INDEX" >> "$INDEX"
 fi
 
-# NMOS and BCP-* repos don't have branch and tags indexes
-if [[ ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" =~ "BCP-" ]]; then
+# NMOS* and BCP-* repos don't have branch and tags indexes
+if [[ ! "$AMWA_ID" =~ "NMOS" && ! "$AMWA_ID" =~ "BCP-" ]]; then
 
     # TODO: DRY on the following...
 
