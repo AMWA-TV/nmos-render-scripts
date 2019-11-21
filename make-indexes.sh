@@ -29,6 +29,33 @@ INTRO_COMMON=.scripts/intro_common.md
 # Filename for index in each dir
 INDEX=index.md
 
+function do_doc {
+    doc=$1
+
+    no_ext="${doc%%.md}"
+    # Spaces causing problems so rename extracted docs to use underscore
+    underscore_space_doc="${doc// /_}"
+    [[ "$underscore_space_doc" != "$doc" ]] && mv "$doc" "$underscore_space_doc"
+
+    # Top level documents have numbers ending in '.0' or '.0.'
+    match_top_level='^docs/[1-9][0-9]*\.0\.? '
+    if [[ "$doc" =~ $match_top_level ]]; then
+        indent=""
+        linktext="${no_ext#* }"
+    else
+        # Removing the top-level part of lower-level link texts
+        # that is the part up to the hyphen and following space
+        indent="  "
+        if [[ $no_ext =~ " - " ]]; then
+            linktext="${no_ext#* - }"
+        else
+            linktext="${no_ext#* }" # no hyphen
+        fi
+    fi
+    [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
+    echo "${indent}- [$linktext]($underscore_space_doc)" >> "$INDEX"    
+}
+
 function do_b_or_t {
     b_or_t=$1
     label=$2
@@ -41,18 +68,11 @@ function do_b_or_t {
         cd "$dir"
 
             # NMOS* and BCP-* repos have docs in the main dir, not docs/
-            # TODO: NMOS-PAR... has additional folder structure to sort!
-
             if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
                 for doc in *.md; do
-                    if [[ "$doc" != "index.md" && "$doc" != "README.md" ]]; then
-                        no_ext=${doc%%.md}
-                        # Spaces causing problems so rename extracted docs to use underscore
-                        underscore_space_doc="${doc// /_}"
-                        [[ "$underscore_space_doc" != "$doc" ]] && mv "$doc" "$underscore_space_doc"
-                        linktext=${no_ext}
-                        echo "- [$linktext]($underscore_space_doc)" >> "$INDEX"
-                    fi
+                    # if [[ "$doc" != "index.md" && "$doc" != "README.md" ]]; then
+                        do_doc "$doc"
+                    # fi
                 done
 
             # NMOS-PARAMETER-REGISTERS has individual dir for each register
@@ -61,36 +81,23 @@ function do_b_or_t {
                     echo "- [$i]($i)" >> "$INDEX"
                 done
 
-            # Other repos have docs/, APIs/, APIs/schemas/, examples/
-            else
+            # NMOS-TESTING has docs/
+            elif [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
+                if [ -d docs ]; then
+                    INDEX_DOCS="docs/$INDEX"
+                    for doc in docs/[1-9]*.md; do
+                        do_doc "$doc"
+                    done
+                fi
 
+            # Other (IS-*) repos may have docs/, APIs/, APIs/schemas/, examples/
+            else
                 if [ -d docs ]; then
                     INDEX_DOCS="docs/$INDEX"
                     echo -e "\n## Documentation for $label $dirname\n" >> "$INDEX"
                     echo -e "## Documentation for $label $dirname\n" >> "$INDEX_DOCS"
                     for doc in docs/[1-9]*.md; do
-                        no_ext="${doc%%.md}"
-                        # Spaces causing problems so rename extracted docs to use underscore
-                        underscore_space_doc="${doc// /_}"
-                        [[ "$underscore_space_doc" != "$doc" ]] && mv "$doc" "$underscore_space_doc"
-
-                        # Top level documents have numbers ending in '.0' or '.0.'
-                        match_top_level='^docs/[1-9][0-9]*\.0\.? '
-                        if [[ "$doc" =~ $match_top_level ]]; then
-                            indent=""
-                            linktext="${no_ext#* }"
-                        else
-                            # Removing the top-level part of lower-level link texts
-                            # that is the part up to the hyphen and following space
-                            indent="  "
-                            if [[ $no_ext =~ " - " ]]; then
-                                linktext="${no_ext#* - }"
-                            else
-                                linktext="${no_ext#* }" # no hyphen
-                            fi
-                        fi
-                        echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
-                        echo "${indent}- [$linktext]($underscore_space_doc)" >> "$INDEX"
+                        do_doc "$doc"
                     done
                 fi
 
@@ -150,8 +157,8 @@ cat "$INTRO" >> "$INDEX"
 echo -e "\n\n---\n\n" >> "$INDEX"
 
 # Heading/intro depends on repo type
-if [[ "$AMWA_ID" == "NMOS" ]]; then
-    echo "## General NMOS Documentation" >> "$INDEX"
+if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
+    echo "## Documentation" >> "$INDEX"
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     echo "## Parameter Registers" >> "$INDEX"
 elif [[ "$AMWA_ID" =~ "BCP-" ]]; then
