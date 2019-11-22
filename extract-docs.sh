@@ -34,7 +34,7 @@ function extract {
     cd source-repo
         git checkout "$checkout"
 
-        # NMOS* and BCP-* repos have docs in the main dir, not docs/
+        # NMOS and BCP-* repos have docs in the main dir, not docs/
         if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
             cp *.md "../$target_dir"
             if [ -d images ] ; then

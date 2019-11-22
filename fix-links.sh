@@ -63,4 +63,20 @@ else
     done
 fi
 
-    
+# Special case: relative links that need to go to the repo not the pages
+if [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
+
+    function rewrite_link {
+        perl -pi -e "s~\]\($1~]($2~g;" $3
+    }
+
+    for tree in {branches,tags}/*; do
+        linkto="$REPO_ADDRESS/blob/${tree##*/}"
+        cd $tree
+            for file in docs/*.md; do
+                rewrite_link "../testssl/" "${linkto}/testssl/" "$file"
+                rewrite_link "../test_data/" "${linkto}/test_data/" "$file"
+            done
+        cd ../..
+    done
+fi
