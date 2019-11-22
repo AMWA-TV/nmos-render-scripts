@@ -11,8 +11,9 @@ else
     echo Getting config from $_CONFIG_YML
 fi
 
-AMWA_ID=$(awk '/amwa_id/ { print $2 }' $_CONFIG_YML)
-REPO_ADDRESS=$(git remote get-url origin)
-DEFAULT_TREE=$(awk '/default_tree:/ { print $2 }' $_CONFIG_YML)
-SHOW_TAGS=$(awk '/show_tags:/ { print $2 }' $_CONFIG_YML)
-SHOW_BRANCHES=$(awk '/show_branches:/ { print $2 }' $_CONFIG_YML)
+AMWA_ID="$(awk '/amwa_id/ { print $2 }' $_CONFIG_YML)"
+REPO_ORIGIN="$(git remote get-url origin)"
+REPO_ADDRESS="${REPO_ORIGIN%.git}"
+DEFAULT_TREE="$(awk '/default_tree:/ { print $2 }' $_CONFIG_YML)"
+SHOW_TAGS="$(awk '/show_tags:/ { print $2 }' $_CONFIG_YML)"
+SHOW_BRANCHES="$(awk '/show_branches:/ { print $2 }' $_CONFIG_YML)"
