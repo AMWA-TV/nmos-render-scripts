@@ -34,7 +34,22 @@ function extract {
     cd source-repo
         git checkout "$checkout"
 
-        # NMOS and BCP-* repos have docs in the main dir, not docs/
+        # NMOS gets copies of some wiki docs
+        if [[ "$AMWA_ID" == "NMOS" ]]; then
+            git clone https://github.com/AMWA-TV/nmos.wiki
+
+            function get_wiki_doc {
+                echo "# $2" > $1
+                cat nmos.wiki/$1 >> $1
+            }
+            get_wiki_doc FAQ.md "NMOS FAQ"
+            get_wiki_doc Glossary.md "NMOS Glossary"
+            get_wiki_doc NMOS-Solutions.md "NMOS Solutions"
+
+            rm -rf nmos.wiki
+        fi
+
+        # NMOS* and BCP-* repos have docs in the main dir, not docs/
         if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
             cp *.md "../$target_dir"
             if [ -d images ] ; then

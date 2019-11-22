@@ -29,7 +29,18 @@ INTRO_COMMON=.scripts/intro_common.md
 # Filename for index in each dir
 INDEX=index.md
 
-function do_doc {
+function add_unnumbered_doc {
+    doc=$1
+
+    # Spaces causing problems so rename extracted docs to use underscore
+    underscore_space_doc="${doc// /_}"
+    [[ "$underscore_space_doc" != "$doc" ]] && mv "$doc" "$underscore_space_doc"
+
+    [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
+    echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
+};
+
+function add_numbered_doc {
     doc=$1
 
     no_ext="${doc%%.md}"
@@ -53,7 +64,7 @@ function do_doc {
         fi
     fi
     [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
-    echo "${indent}- [$linktext]($underscore_space_doc)" >> "$INDEX"    
+    echo "${indent}- [$linktext]($underscore_space_doc)" >> "$INDEX"
 }
 
 function do_b_or_t {
@@ -67,37 +78,37 @@ function do_b_or_t {
         echo "Making $dirname/$INDEX"
         cd "$dir"
 
-            # NMOS* and BCP-* repos have docs in the main dir, not docs/
+            # NMOS* and BCP-* repos have unnumbered docs in the main dir
             if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
                 for doc in *.md; do
-                    # if [[ "$doc" != "index.md" && "$doc" != "README.md" ]]; then
-                        do_doc "$doc"
-                    # fi
+                    if [[ "$doc" != "index.md" && "$doc" != "README.md" ]]; then
+                        add_unnumbered_doc "$doc"
+                    fi
                 done
 
             # NMOS-PARAMETER-REGISTERS has individual dir for each register
             elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-                for i in common device-control-types device-types formats node-service-types tags transports; do
-                    echo "- [$i]($i)" >> "$INDEX"
+                for reg in common device-control-types device-types formats node-service-types tags transports; do
+                    echo "- [$reg]($reg)" >> "$INDEX"
                 done
 
-            # NMOS-TESTING has docs/
+            # NMOS-TESTING has numbered docs in docs/
             elif [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
                 if [ -d docs ]; then
                     INDEX_DOCS="docs/$INDEX"
                     for doc in docs/[1-9]*.md; do
-                        do_doc "$doc"
+                        add_numbered_doc "$doc"
                     done
                 fi
 
-            # Other (IS-*) repos may have docs/, APIs/, APIs/schemas/, examples/
+            # Other (IS-*) repos may have numbered docs/, APIs/, APIs/schemas/, examples/
             else
                 if [ -d docs ]; then
                     INDEX_DOCS="docs/$INDEX"
                     echo -e "\n## Documentation for $label $dirname\n" >> "$INDEX"
                     echo -e "## Documentation for $label $dirname\n" >> "$INDEX_DOCS"
                     for doc in docs/[1-9]*.md; do
-                        do_doc "$doc"
+                        add_numbered_doc "$doc"
                     done
                 fi
 
