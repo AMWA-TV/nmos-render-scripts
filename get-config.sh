@@ -12,7 +12,7 @@ else
 fi
 
 AMWA_ID=$(awk '/amwa_id/ { print $2 }' $_CONFIG_YML)
-REPO_ADDRESS=https://github.com/AMWA-TV$(awk '/baseurl:/ { print $2 }' $_CONFIG_YML)
+REPO_ADDRESS=$(git remote get-url origin)
 DEFAULT_TREE=$(awk '/default_tree:/ { print $2 }' $_CONFIG_YML)
 SHOW_TAGS=$(awk '/show_tags:/ { print $2 }' $_CONFIG_YML)
 SHOW_BRANCHES=$(awk '/show_branches:/ { print $2 }' $_CONFIG_YML)
