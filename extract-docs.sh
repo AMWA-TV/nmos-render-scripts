@@ -40,7 +40,8 @@ function extract {
 
             function get_wiki_doc {
                 echo "# $2" > $1
-                cat nmos.wiki/$1 >> $1
+                # Strip off table of contents comments
+                sed 's~^\[//\]:.*~~' nmos.wiki/$1 >> $1
             }
             get_wiki_doc FAQ.md "NMOS FAQ"
             get_wiki_doc Glossary.md "NMOS Glossary"
