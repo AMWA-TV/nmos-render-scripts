@@ -29,19 +29,14 @@ function process_file {
     # Change .json links to .html and use with-refs for schemas
     perl -pi -e 's:\.json\):.html\):g; s:/html-APIs/schemas:/html-APIs/schemas/with-refs:g;' "$1"
 
-    # Change %20 escaped spaces in links to understores
-    perl -ni -e '@parts = split /(\(.*?\.md\))/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
+    # Change %20 escaped spaces in links to understores. Allow for possible #target-in-page links.
+    perl -ni -e '@parts = split /(\(.*?\.md(?:#.*\b)?\))/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
 
     # Same but for reference links
-    perl -ni -e '@parts = split /(\]:.*?\.md)/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
+    perl -ni -e '@parts = split /(\]:.*?\.md(?:#.*\b)?)/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
 
     # For other repos, link to documentation
-    perl -pi -e 's:github\.com/AMWA-TV/:amwa-tv.github.io/:gi;' "$1" 
-
-    # Removing the unwanted "schemas/" in .html links due to raml2html v6 workaround
-    # for file in {branches,tags}/*/html-APIs/*.html; do
-    #     perl -pi -e 's:schemas/::g;' "$file"
-    # done
+    #perl -pi -e 's:github\.com/AMWA-TV/:amwa-tv.github.io/:gi;' "$1" 
 }
 
 # NMOS* and BCP-* repos have docs in the main dir, not docs/
