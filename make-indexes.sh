@@ -154,7 +154,11 @@ function do_b_or_t {
 }
 
 do_b_or_t branches branch
-do_b_or_t tags release/tag
+
+# NMOS-PARAMETER-REGISTERS has NO GIT TAGS (see comment in extract-docs.sh)
+if [[ "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
+    do_b_or_t tags release/tag
+fi
 
 echo "Making top level $INDEX"
 

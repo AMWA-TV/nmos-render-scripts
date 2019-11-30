@@ -47,7 +47,7 @@ if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
 
 # NMOS-PARAMETER-REGISTERS has individual dir for each register
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-    for file in {branches,tags}/*/*/*.md index.md; do
+    for file in branches/*/*/*.md index.md; do  # NO GIT tags (see comment in extract-docs.sh)
         process_file "$file"
     done
 
