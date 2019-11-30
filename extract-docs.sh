@@ -97,9 +97,9 @@ EOF
                         raml2html --theme raml2html-nmos-theme $i >> "$HTML_API"
                         [ -e $i.bak ] && mv $i.bak $i # Otherwise next checkout will fail
                     done
-                    mkdir "../../$target_dir/html-APIs"
-                    mv *.html "../../$target_dir/html-APIs/"
-                    cp ../../.scripts/json-formatter.js "../../$target_dir/html-APIs/"
+                    mkdir "../../$target_dir/APIs"
+                    mv *.html "../../$target_dir/APIs/"
+                    cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/"
 
                     if [ -d schemas ]; then
                         echo "Rendering with-refs schemas..."
@@ -115,13 +115,13 @@ EOF
                             render-json.sh "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/resolved/with-refs}" "Show referenced schemas with \$ref" > "$HTML_SCHEMA"
                         done
                         echo "Moving schemas..."
-                        mkdir "../../$target_dir/html-APIs/schemas"
-                        mkdir "../../$target_dir/html-APIs/schemas/with-refs"
-                        cp ../../.scripts/json-formatter.js "../../$target_dir/html-APIs/schemas/with-refs"
-                        mv schemas/with-refs/*.html "../../$target_dir/html-APIs/schemas/with-refs"
-                        mkdir "../../$target_dir/html-APIs/schemas/resolved"
-                        cp ../../.scripts/json-formatter.js "../../$target_dir/html-APIs/schemas/resolved"
-                        mv schemas/resolved/*.html "../../$target_dir/html-APIs/schemas/resolved"
+                        mkdir "../../$target_dir/APIs/schemas"
+                        mkdir "../../$target_dir/APIs/schemas/with-refs"
+                        cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/with-refs"
+                        mv schemas/with-refs/*.html "../../$target_dir/APIs/schemas/with-refs"
+                        mkdir "../../$target_dir/APIs/schemas/resolved"
+                        cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/resolved"
+                        mv schemas/resolved/*.html "../../$target_dir/APIs/schemas/resolved"
                         echo "Tidying..."
                         # Restore things how they were to ensure next checkout doesn't overwrite
                         mv schemas/with-refs/*.json schemas/ 

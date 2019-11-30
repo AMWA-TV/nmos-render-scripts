@@ -112,11 +112,11 @@ function do_b_or_t {
                     done
                 fi
 
-                if [ -d html-APIs ]; then
-                    INDEX_APIS="html-APIs/$INDEX"
+                if [ -d APIs ]; then
+                    INDEX_APIS="APIs/$INDEX"
                     echo -e "\n## APIs for $label $dirname\n" >> "$INDEX"
                     echo -e "## APIs for $label $dirname\n" > "$INDEX_APIS"
-                    for api in html-APIs/*.html; do
+                    for api in APIs/*.html; do
                         no_ext="${api%%.html}"
                         linktext="${no_ext##*/}"
                         echo "- [$linktext](${api##*/})" >> "$INDEX_APIS"
@@ -124,11 +124,11 @@ function do_b_or_t {
                     done
                 fi
 
-                if [ -d html-APIs/schemas ]; then
-                    INDEX_SCHEMAS="html-APIs/schemas/$INDEX"
-                    echo -e "\n### [JSON Schemas](html-APIs/schemas/)\n" >> "$INDEX"
+                if [ -d APIs/schemas ]; then
+                    INDEX_SCHEMAS="APIs/schemas/$INDEX"
+                    echo -e "\n### [JSON Schemas](APIs/schemas/)\n" >> "$INDEX"
                     echo -e "## JSON Schemas for $label $dirname\n" > "$INDEX_SCHEMAS"
-                    for schema in html-APIs/schemas/with-refs/*.html; do
+                    for schema in APIs/schemas/with-refs/*.html; do
                         no_ext="${schema%%.html}"
                         linktext="${no_ext##*/}"
                         echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
