@@ -23,20 +23,19 @@ shopt -s nullglob
 echo "Fixing links in documents"
 
 function process_file {
+    # Fix overview links
+    perl -pi -e 's~https://github.com/AMWA-TV/nmos/blob/master/NMOS%20Technical%20Overview.md~https://amwa-tv.github.io/nmos/branches/master/NMOS_Technical_Overview.html~gi;' "$1" 
     # Change .raml links to .html
     perl -pi -e 's:\.raml\):.html\):g;' "$1"
 
     # Change .json links to .html and use with-refs for schemas
     perl -pi -e 's:\.json\):.html\):g; s:/APIs/schemas:/APIs/schemas/with-refs:g;' "$1"
 
-    # Change %20 escaped spaces in links to understores. Allow for possible #target-in-page links.
+    # Change %20 escaped spaces in links to underscores. Allow for possible #target-in-page links.
     perl -ni -e '@parts = split /(\(.*?\.md(?:#.*\b)?\))/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
 
     # Same but for reference links
     perl -ni -e '@parts = split /(\]:.*?\.md(?:#.*\b)?)/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
-
-    # For other repos, link to documentation
-    #perl -pi -e 's:github\.com/AMWA-TV/:amwa-tv.github.io/:gi;' "$1" 
 }
 
 # NMOS* and BCP-* repos have docs in the main dir, not docs/
@@ -57,6 +56,9 @@ else
         process_file "$file"
     done
 fi
+
+
+
 
 # Special case: relative links that need to go to the repo not the pages
 if [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
