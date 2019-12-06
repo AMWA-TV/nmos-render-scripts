@@ -26,6 +26,32 @@ if [[ "$AMWA_ID" =~ "IS-" && ! -d node_modules/.bin ]]; then
     exit 1
 fi
 
+# Unfortunately bash doesn't have proper functions or scoping...
+function make_label {
+    local label="${1%%.md}"
+    label="${label//%20/ }"                   
+    label="${label/#*([0-9.]) /}"
+    label="${label/#* - /}"
+    echo $label
+ }
+
+function add_nav_links {
+    local prev="$1"
+    local next="$2"
+    local file="$3"
+    local string=
+
+    if [[ -n "$prev" ]]; then
+        string+="[←$(make_label $prev) ]($prev) · "
+    fi
+    string+="[ Up↑ ](..)"
+    if [[ -n "$next" ]]; then
+        string+=" · [$(make_label $next)→]($next)"
+    fi
+    sed -i -e "2i$string" -e "\$a\\\n$string" "$file"
+}
+
+
 function extract {
     checkout=$1
     target_dir=$2
@@ -64,32 +90,6 @@ function extract {
 
         # Other repos have docs/, APIs/, examples/
         else
-
-            function add_nav_links {
-                prev="$1"
-                next="$2"
-                file="$3"
-                string=
-
-                # Unfortunately bash doesn't have proper functions that return a value so this sets $label
-                function make_label {
-                    label="${1%%.md}"
-                    label="${label//%20/ }"                   
-                    label="${label/#*([0-9.]) /}"
-                    label="${label/#* - /}"
-                }
-                if [[ -n "$prev" ]]; then
-                    make_label "$prev"
-                    string+="[←${label}]($prev) · "
-                fi
-                string+="[ Up↑ ](..)"
-                if [[ -n "$next" ]]; then
-                    make_label "$next"
-                    string+=" · [${label}→]($next)"
-                fi
-                sed -i -e "2i$string" -e "\$a\\\n$string" "$file"
-            }
-
             if [ -d docs ]; then
                 cd docs
                 mkdir "../../$target_dir/docs"
