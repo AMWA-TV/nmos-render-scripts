@@ -15,6 +15,7 @@
 # limitations under the License.
 
 set -o errexit
+shopt -s extglob
 
 PATH=$PWD/.scripts:$PWD/node_modules/.bin:$PATH
 
@@ -70,9 +71,22 @@ function extract {
                 file="$3"
                 string=
 
-                [[ -n "$prev" ]] && string+="[Previous]($prev) "
-                string+="[Up](..)"
-                [[ -n "$next" ]] && string+=" [Next]($next)"
+                # Unfortunately bash doesn't have proper functions that return a value so this sets $label
+                function make_label {
+                    label="${1%%.md}"
+                    label="${label//%20/ }"                   
+                    label="${label/#*([0-9.]) /}"
+                    label="${label/#* - /}"
+                }
+                if [[ -n "$prev" ]]; then
+                    make_label "$prev"
+                    string+="[←${label}]($prev) · "
+                fi
+                string+="[ Up↑ ](..)"
+                if [[ -n "$next" ]]; then
+                    make_label "$next"
+                    string+=" · [${label}→]($next)"
+                fi
                 sed -i -e "2i$string" -e "\$a\\\n$string" "$file"
             }
 
