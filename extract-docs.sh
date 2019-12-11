@@ -31,7 +31,7 @@ function make_label {
     local label="${1%%.md}"
     label="${label//%20/ }"                   
     label="${label/#*([0-9.]) /}"
-    label="${label/#* - /}"
+    # label="${label/#* - /}"
     echo $label
  }
 
@@ -44,7 +44,7 @@ function add_nav_links {
     if [[ -n "$prev" ]]; then
         string+="[←$(make_label $prev) ]($prev) · "
     fi
-    string+="[ Up↑ ](..)"
+    string+="[ Index↑ ](..)"
     if [[ -n "$next" ]]; then
         string+=" · [$(make_label $next)→]($next)"
     fi
