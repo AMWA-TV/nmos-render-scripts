@@ -36,7 +36,8 @@ function add_unnumbered_doc {
     underscore_space_doc="${doc// /_}"
     [[ "$underscore_space_doc" != "$doc" ]] && mv "$doc" "$underscore_space_doc"
 
-    [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
+    # [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
+    [[ "$INDEX_DOCS" ]] && echo "- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
     echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
 };
 
@@ -66,6 +67,17 @@ function add_numbered_doc {
     [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
     echo "${indent}- [$linktext]($underscore_space_doc)" >> "$INDEX"
 }
+
+function add_possibly_nested_example {
+    example=$1
+
+    # Spaces causing problems so rename extracted docs to use underscore
+    underscore_space_doc="${doc// /_}"
+    [[ "$underscore_space_doc" != "$doc" ]] && mv "$doc" "$underscore_space_doc"
+
+    [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
+    echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
+};
 
 function do_b_or_t {
     b_or_t=$1

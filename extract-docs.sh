@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Copyright 2019 British Broadcasting Corporation
 #
@@ -15,7 +15,7 @@
 # limitations under the License.
 
 set -o errexit
-shopt -s extglob
+shopt -s extglob globstar
 
 PATH=$PWD/.scripts:$PWD/node_modules/.bin:$PATH
 
@@ -179,15 +179,18 @@ EOF
             fi
             if [ -d examples ]; then
                 echo "Rendering examples..."
-                for i in examples/*.json; do
-                   HTML_EXAMPLE=${i%%.json}.html 
-                   # echo "Rendering $HTML_EXAMPLE from $i..." 
-                   render-json.sh $i "Example ${i##*/}" >> "$HTML_EXAMPLE"
-                done
-                echo "Moving examples..."
-                mkdir "../$target_dir/examples"
-                mv examples/*.html "../$target_dir/examples"
-                cp ../.scripts/json-formatter.js "../$target_dir/examples"
+                cd examples
+                    for i in **/*.json; do
+                        flat=${i//*\//}
+                        HTML_EXAMPLE=${flat%%.json}.html 
+                        echo "Rendering $HTML_EXAMPLE from $i..." 
+                        render-json.sh $i "Example ${i##*/}" >> "$HTML_EXAMPLE"
+                    done
+                    echo "Moving examples..."
+                    mkdir "../../$target_dir/examples"
+                    mv *.html "../../$target_dir/examples"
+                    cp ../../.scripts/json-formatter.js "../../$target_dir/examples"
+                cd ..
             fi
         fi
     cd ..
