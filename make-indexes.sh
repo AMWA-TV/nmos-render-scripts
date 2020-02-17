@@ -174,10 +174,18 @@ fi
 
 echo "Making top level $INDEX"
 
-# Add build status badge
-CI_URL="${REPO_ADDRESS/github.com/travis-ci.com}"
-DEFAULT_BRANCH="$(git remote show origin | awk '/HEAD branch/ { print $3 }')"
-echo -e "[![Build Status](${CI_URL}.svg?branch=${DEFAULT_BRANCH})](${CI_URL})\n" > "$INDEX"
+# Add lint and render status badges
+ci_url="${REPO_ADDRESS/github.com/travis-ci.com}"
+default_branch="$(git remote show origin | awk '/HEAD branch/ { print $3 }')"
+cat << EOF > "$INDEX"
+| Repository | Default Branch | Lint (default) | Render (all) |
+| --- | --- | --- | --- |
+| [${REPO_ADDRESS##*/}]($REPO_ADDRESS) \
+| $default_branch \
+| <a href="${ci_url}?branch=${default_branch}"><img src="${ci_url}.svg?branch=${default_branch}" width="100"/></a> \
+| <a href="${ci_url}?branch=gh-pages"><img src="${ci_url}.svg?branch=gh-pages" width="100"/></a> \
+|
+EOF
 
 # Repo-specific About: section...
 echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n" >> "$INDEX"
