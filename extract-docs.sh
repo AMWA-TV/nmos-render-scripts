@@ -166,9 +166,11 @@ EOF
                         mkdir "../../$target_dir/APIs/schemas"
                         mkdir "../../$target_dir/APIs/schemas/with-refs"
                         cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/with-refs"
+                        cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/with-refs"
                         mv schemas/with-refs/*.html "../../$target_dir/APIs/schemas/with-refs"
                         mkdir "../../$target_dir/APIs/schemas/resolved"
                         cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/resolved"
+                        cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/resolved"
                         mv schemas/resolved/*.html "../../$target_dir/APIs/schemas/resolved"
                         echo "Tidying..."
                         # Restore things how they were to ensure next checkout doesn't overwrite
@@ -190,6 +192,7 @@ EOF
                     mkdir "../../$target_dir/examples"
                     mv *.html "../../$target_dir/examples"
                     cp ../../.scripts/json-formatter.js "../../$target_dir/examples"
+                    cp -r ../../.scripts/codemirror "../../$target_dir/examples"
                 cd ..
             fi
         fi
