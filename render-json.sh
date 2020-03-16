@@ -16,6 +16,13 @@
 
 set -o errexit
 
+if [ $1 == "-n" ]; then
+    SHOW_LINE_NUMBERS=true
+    shift
+else
+    SHOW_LINE_NUMBERS=false
+fi
+
 JSON_FILE=$1
 NAME=$2
 ALT_HREF=$3
@@ -79,7 +86,7 @@ window.editor_json = CodeMirror.fromTextArea(mytextarea, {
         json: true
     },
     readOnly: true,
-    lineNumbers: true,
+    lineNumbers: $SHOW_LINE_NUMBERS,
     lineWrapping: true,
     extraKeys: {"Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
     foldGutter: true,
