@@ -154,21 +154,23 @@ EOF
                         for i in schemas/with-refs/*.json; do
                             HTML_SCHEMA=${i%%.json}.html
                             # echo "Generating $HTML_SCHEMA from $i..."
-                            render-json.sh "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/with-refs/resolved}" "Resolve referenced schemas" > "$HTML_SCHEMA"
+                            render-json.sh -n "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/with-refs/resolved}" "Resolve referenced schemas (may reorder keys)" > "$HTML_SCHEMA"
                         done
                         echo "Rendering resolved schemas..."
                         for i in schemas/resolved/*.json; do
                             HTML_SCHEMA=${i%%.json}.html
                             # echo "Generating $HTML_SCHEMA from $i..."
-                            render-json.sh "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/resolved/with-refs}" "Show referenced schemas with \$ref" > "$HTML_SCHEMA"
+                            render-json.sh "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/resolved/with-refs}" "Show original (referenced schemas with \$ref)" > "$HTML_SCHEMA"
                         done
                         echo "Moving schemas..."
                         mkdir "../../$target_dir/APIs/schemas"
                         mkdir "../../$target_dir/APIs/schemas/with-refs"
                         cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/with-refs"
+                        cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/with-refs"
                         mv schemas/with-refs/*.html "../../$target_dir/APIs/schemas/with-refs"
                         mkdir "../../$target_dir/APIs/schemas/resolved"
                         cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/resolved"
+                        cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/resolved"
                         mv schemas/resolved/*.html "../../$target_dir/APIs/schemas/resolved"
                         echo "Tidying..."
                         # Restore things how they were to ensure next checkout doesn't overwrite
@@ -184,12 +186,13 @@ EOF
                         flat=${i//*\//}
                         HTML_EXAMPLE=${flat%%.json}.html 
                         echo "Rendering $HTML_EXAMPLE from $i..." 
-                        render-json.sh $i "Example ${i##*/}" >> "$HTML_EXAMPLE"
+                        render-json.sh -n $i "Example ${i##*/}" >> "$HTML_EXAMPLE"
                     done
                     echo "Moving examples..."
                     mkdir "../../$target_dir/examples"
                     mv *.html "../../$target_dir/examples"
                     cp ../../.scripts/json-formatter.js "../../$target_dir/examples"
+                    cp -r ../../.scripts/codemirror "../../$target_dir/examples"
                 cd ..
             fi
         fi
