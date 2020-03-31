@@ -201,7 +201,7 @@ elif [[ "$AMWA_ID" =~ "BCP-" ]]; then
     echo "## Recommendations and related documentation" >> "$INDEX"
 else
     # Common intro for specs
-    sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g" "$INTRO_COMMON" >> "$INDEX"
+    sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g; s~%DEFAULT_TREE%~${DEFAULT_TREE}~g" "$INTRO_COMMON" >> "$INDEX"
 fi
 
 # Add the default links at the top - correct the links while copying text
