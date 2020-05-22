@@ -48,7 +48,8 @@ function add_nav_links {
     if [[ -n "$next" ]]; then
         string+=" · [$(make_label $next)→]($next)"
     fi
-    sed -i -e "2i$string" -e "\$a\\\n$string" "$file"
+    # this assumes there is the main heading on line 1 and line 2 is either blank or {:no_toc}
+    sed -i -e "3i$string\\n" -e "\$a\\\n$string" "$file"
 }
 
 
