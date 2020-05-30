@@ -36,6 +36,9 @@ function process_file {
 
     # Same but for reference links
     perl -ni -e '@parts = split /(\]:.*?\.md(?:#.*\b)?)/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
+
+    # Replace any copyright with blank line (because it is added in a footer)
+    perl -pi -e 's:_\(c\) AMWA.*_$::' "$1"
 }
 
 # NMOS* and BCP-* repos have docs in the main dir, not docs/
