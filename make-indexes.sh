@@ -93,7 +93,10 @@ function do_b_or_t {
             # NMOS* and BCP-* repos have unnumbered docs in the main dir
             if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
                 for doc in *.md; do
-                    if [[ "$doc" != "index.md" && "$doc" != "README.md" ]]; then
+                    if [[ "$doc" != "index.md" &&
+                          "$doc" != "README.md" &&
+                          "$doc" != "CHANGELOG.md" &&
+                          "$doc" != "CONTRIBUTING.md" ]]; then
                         add_unnumbered_doc "$doc"
                     fi
                 done
@@ -198,7 +201,7 @@ if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     echo "## Parameter Registers" >> "$INDEX"
 elif [[ "$AMWA_ID" =~ "BCP-" ]]; then
-    echo "## Recommendations and related documentation" >> "$INDEX"
+    echo "## Best Current Practice document(s)" >> "$INDEX"
 else
     # Common intro for specs
     sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g; s~%DEFAULT_TREE%~${DEFAULT_TREE}~g" "$INTRO_COMMON" >> "$INDEX"
