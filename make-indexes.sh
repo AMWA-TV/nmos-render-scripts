@@ -200,7 +200,7 @@ if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
     echo "## Documentation" >> "$INDEX"
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     echo "## Parameter Registers" >> "$INDEX"
-elif [[ "$AMWA_ID" =~ "BCP-" ]]; then
+elif [[ "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
     echo "## Best Current Practice document(s)" >> "$INDEX"
 else
     # Common intro for specs
@@ -213,8 +213,8 @@ if [ "$DEFAULT_TREE" ]; then
     sed "s:(:($DEFAULT_TREE/:" "$DEFAULT_TREE/$INDEX" >> "$INDEX"
 fi
 
-# NMOS* and BCP-* repos don't have branch and tags indexes
-if [[ ! "$AMWA_ID" =~ "NMOS" && ! "$AMWA_ID" =~ "BCP-" ]]; then
+# These repos don't have branch and tags indexes
+if [[ ! "$AMWA_ID" =~ "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BCP-003" ]]; then
 
     # TODO: DRY on the following...
 
