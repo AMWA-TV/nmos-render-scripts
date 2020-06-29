@@ -90,8 +90,8 @@ function do_b_or_t {
         echo "Making $dirname/$INDEX"
         cd "$dir"
 
-            # NMOS* and BCP-* repos have unnumbered docs in the main dir
-            if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
+            # These repos have unnumbered docs in the main dir
+            if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
                 for doc in *.md; do
                     if [[ "$doc" != "index.md" &&
                           "$doc" != "README.md" &&
@@ -116,7 +116,7 @@ function do_b_or_t {
                     done
                 fi
 
-            # Other (IS-*) repos may have numbered docs/, APIs/, APIs/schemas/, examples/
+            # Other repos may have numbered docs/, APIs/, APIs/schemas/, examples/
             else
                 if [ -d docs ]; then
                     INDEX_DOCS="docs/$INDEX"

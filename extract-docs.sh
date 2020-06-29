@@ -78,8 +78,8 @@ function extract {
             rm -rf nmos.wiki
         fi
 
-        # NMOS* and BCP-* repos have docs in the main dir, not docs/
-        if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
+        # These repos have docs in the main dir, not docs/
+        if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
             cp *.md "../$target_dir"
             if [ -d images ] ; then
                 cp -r images "../$target_dir" 
@@ -89,7 +89,7 @@ function extract {
         elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
             cp -r common device-control-types device-types formats node-service-types tags transports "../$target_dir"
 
-        # Other repos have docs/, APIs/, examples/
+        # Other repos have some or all of docs/, APIs/, examples/
         else
             if [ -d docs ]; then
                 cd docs

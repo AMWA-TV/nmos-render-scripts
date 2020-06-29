@@ -41,8 +41,8 @@ function process_file {
     perl -pi -e 's:_\(c\) AMWA.*_$::' "$1"
 }
 
-# NMOS* and BCP-* repos have docs in the main dir, not docs/
-if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" =~ "BCP-" ]]; then
+# These repos have docs in the main dir, not docs/
+if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
     for file in {branches,tags}/*/*.md index.md; do
         process_file "$file"
     done
@@ -53,7 +53,7 @@ elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
         process_file "$file"
     done
 
-# Other repos have docs/, APIs/, examples/
+# Other repos have some or all of docs/, APIs/, examples/
 else
     for file in {branches,tags}/*/docs/*.md; do
         process_file "$file"
