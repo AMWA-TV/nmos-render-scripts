@@ -220,8 +220,8 @@ if [[ ! "$AMWA_ID" =~ "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BC
 
     echo Adding branches index...
     INDEX_BRANCHES="branches/index.md"
-    echo "## Branches" > "$INDEX_BRANCHES"
-    echo -e "\n## Branches" >> "$INDEX"
+    echo "## Development Branches" > "$INDEX_BRANCHES"
+    echo -e "\n## Development Branches" >> "$INDEX"
     for dir in branches/*; do
         [ ! -d $dir ] && continue
         branch="${dir##*/}"
@@ -231,8 +231,8 @@ if [[ ! "$AMWA_ID" =~ "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BC
 
     echo Adding tags index...
     INDEX_TAGS="tags/index.md"
-    echo "## Releases/Tags" > "$INDEX_TAGS"
-    echo -e "\n## Releases/Tags" >> "$INDEX"
+    echo "## Published Releases/Tags" > "$INDEX_TAGS"
+    echo -e "\n##  Published Releases/Tags" >> "$INDEX"
     for dir in tags/*; do
         [ ! -d $dir ] && continue
         tag="${dir##*/}"
