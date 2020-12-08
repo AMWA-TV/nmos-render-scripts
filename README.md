@@ -1,7 +1,4 @@
 # NMOS Documentation Build Scripts
 
-(c) AMWA 2019
-
 This repo holds scripts used to extract and render documentation, RAML and JSON for NMOS specification repos.
-
-It will replace the scripts in the gh-pages branch of these repos.
+See the gh-pages branch of https://github.com/AMWA-TV/nmos-template for more details of how it is used.
