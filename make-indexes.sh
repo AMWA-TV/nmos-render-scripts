@@ -103,8 +103,8 @@ function do_b_or_t {
 
             # NMOS-PARAMETER-REGISTERS has individual dir for each register
             elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-                for reg in common device-control-types device-types formats node-service-types tags transports; do
-                    echo "- [$reg]($reg)" >> "$INDEX"
+                for reg in common device-control-types device-types formats node-service-types tags transports capabilities; do
+                    [[ -d $reg ]] && echo "- [$reg]($reg)" >> "$INDEX"
                 done
 
             # NMOS-TESTING has numbered docs in docs/
@@ -213,15 +213,21 @@ if [ "$DEFAULT_TREE" ]; then
     sed "s:(:($DEFAULT_TREE/:" "$DEFAULT_TREE/$INDEX" >> "$INDEX"
 fi
 
-# These repos don't have branch and tags indexes
-if [[ ! "$AMWA_ID" =~ "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BCP-003" ]]; then
+# TODO: DRY on the following...
 
-    # TODO: DRY on the following...
 
+# These excluded repos don't have branch and tags indexes
+if [[ ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BCP-003" ]]; then
     echo Adding branches index...
     INDEX_BRANCHES="branches/index.md"
-    echo "## Development Branches" > "$INDEX_BRANCHES"
-    echo -e "\n## Development Branches" >> "$INDEX"
+    # Parameter Registers use branches for published and dev versions
+    if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+        echo "## Branches" > "$INDEX_BRANCHES"
+        echo -e "\n## Branches" >> "$INDEX"
+    else
+        echo "## Development Branches" > "$INDEX_BRANCHES"
+        echo -e "\n## Development Branches" >> "$INDEX"
+    fi
     for dir in branches/*; do
         [ ! -d $dir ] && continue
         branch="${dir##*/}"
@@ -229,16 +235,19 @@ if [[ ! "$AMWA_ID" =~ "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BC
         echo -e "\n[$branch]($branch/)" >>  "$INDEX_BRANCHES"
     done
 
-    echo Adding tags index...
-    INDEX_TAGS="tags/index.md"
-    echo "## Published Releases/Tags" > "$INDEX_TAGS"
-    echo -e "\n##  Published Releases/Tags" >> "$INDEX"
-    for dir in tags/*; do
-        [ ! -d $dir ] && continue
-        tag="${dir##*/}"
-        echo -e "\n[$tag](tags/$tag/)" >>  "$INDEX"
-        echo -e "\n[$tag]($tag/)" >>  "$INDEX_TAGS"
-    done
+    # No tags for Parameter Registers
+    if [[ "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
+        echo Adding tags index...
+        INDEX_TAGS="tags/index.md"
+        echo "## Published Releases/Tags" > "$INDEX_TAGS"
+        echo -e "\n##  Published Releases/Tags" >> "$INDEX"
+        for dir in tags/*; do
+            [ ! -d $dir ] && continue
+            tag="${dir##*/}"
+            echo -e "\n[$tag](tags/$tag/)" >>  "$INDEX"
+            echo -e "\n[$tag]($tag/)" >>  "$INDEX_TAGS"
+        done
+    fi
 
 fi
 

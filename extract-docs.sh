@@ -87,7 +87,9 @@ function extract {
 
         # NMOS-PARAMETER-REGISTERS has individual dir for each register
         elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-            cp -r common device-control-types device-types formats node-service-types tags transports "../$target_dir"
+            for register in common device-control-types device-types formats node-service-types tags transports capabilities; do
+                [[ -d $register ]] && cp -r $register "../$target_dir"
+            done
 
         # Other repos have some or all of docs/, APIs/, examples/
         else
