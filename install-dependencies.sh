@@ -16,5 +16,8 @@ rm -rf raml2html-nmos-theme
 git clone https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/raml2html-nmos-theme
 cp .scripts/package.json .
 yarn install
-sudo pip3 install setuptools
-sudo pip3 install jsonref pathlib
+#sudo pip3 install setuptools
+#sudo pip3 install jsonref pathlib
+pip3 install setuptools
+pip3 install jsonref
+pip3 install pathlib
