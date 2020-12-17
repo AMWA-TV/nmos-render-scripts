@@ -177,16 +177,15 @@ fi
 
 echo "Making top level $INDEX"
 
-# Add lint and render status badges
-ci_url="${REPO_ADDRESS/github.com/travis-ci.com}"
+# Add lint and render status badges -- with GitHub Actions these default to default branch
 default_branch="$(git remote show origin | awk '/HEAD branch/ { print $3 }')"
 cat << EOF > "$INDEX"
 | Repository | Default Branch | Lint (default) | Render (all) |
 | --- | --- | --- | --- |
 | [${REPO_ADDRESS##*/}]($REPO_ADDRESS) \
 | $default_branch \
-| <a href="${ci_url}?branch=${default_branch}"><img src="${ci_url}.svg?branch=${default_branch}" width="100"/></a> \
-| <a href="${ci_url}?branch=gh-pages"><img src="${ci_url}.svg?branch=gh-pages" width="100"/></a> \
+| <a href="${REPO_ADDRESS}/actions?query=workflow%3ALint"><img src="${REPO_ADDRESS}/workflows/Lint/badge.svg" width="100"/></a> \
+| <a href="${REPO_ADDRESS}/actions?query=workflow%3ARender"><img src="${REPO_ADDRESS}/workflows/Render/badge.svg" width="100"/></a> \
 |
 EOF
 
