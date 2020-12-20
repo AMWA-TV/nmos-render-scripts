@@ -184,8 +184,8 @@ cat << EOF > "$INDEX"
 | --- | --- | --- | --- |
 | [${REPO_ADDRESS##*/}]($REPO_ADDRESS) \
 | $default_branch \
-| <a href="${REPO_ADDRESS}/actions?query=workflow%3ALint"><img src="${REPO_ADDRESS}/workflows/Lint/badge.svg" width="100"/></a> \
-| <a href="${REPO_ADDRESS}/actions?query=workflow%3ARender"><img src="${REPO_ADDRESS}/workflows/Render/badge.svg" width="100"/></a> \
+| [![Lint Status]($REPO_ADDRESS/workflows/Lint/badge.svg)]($REPO_ADDRESS/actions?query=workflow%3ALint) \
+| [![Render Status]($REPO_ADDRESS/workflows/Render/badge.svg)]($REPO_ADDRESS/actions?query=workflow%3ARender) \
 |
 EOF
 
