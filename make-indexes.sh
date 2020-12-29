@@ -85,88 +85,89 @@ function do_b_or_t {
     label=$2
     
     echo "Processing $b_or_t $INDEX..."
-    cd "$b_or_t"
-    for dir in */; do
-        dirname="${dir%%/}"
-        echo "Making $dirname/$INDEX"
-        cd "$dir"
+    (
+        cd "$b_or_t" || exit 1
+        for dir in */; do
+            dirname="${dir%%/}"
+            echo "Making $dirname/$INDEX"
+            (
+                cd "$dir" || exit 1
 
-            # These repos have unnumbered docs in the main dir
-            if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
-                for doc in *.md; do
-                    if [[ "$doc" != "index.md" &&
-                          "$doc" != "README.md" &&
-                          "$doc" != "CHANGELOG.md" &&
-                          "$doc" != "CONTRIBUTING.md" ]]; then
-                        add_unnumbered_doc "$doc"
+                # These repos have unnumbered docs in the main dir
+                if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
+                    for doc in *.md; do
+                        if [[ "$doc" != "index.md" &&
+                            "$doc" != "README.md" &&
+                            "$doc" != "CHANGELOG.md" &&
+                            "$doc" != "CONTRIBUTING.md" ]]; then
+                            add_unnumbered_doc "$doc"
+                        fi
+                    done
+
+                # NMOS-PARAMETER-REGISTERS has individual dir for each register
+                elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+                    for reg in common device-control-types device-types formats node-service-types tags transports; do
+                        echo "- [$reg]($reg)" >> "$INDEX"
+                    done
+
+                # NMOS-TESTING has numbered docs in docs/
+                elif [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
+                    if [ -d docs ]; then
+                        INDEX_DOCS="docs/$INDEX"
+                        for doc in docs/[1-9]*.md; do
+                            add_numbered_doc "$doc"
+                        done
                     fi
-                done
 
-            # NMOS-PARAMETER-REGISTERS has individual dir for each register
-            elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-                for reg in common device-control-types device-types formats node-service-types tags transports; do
-                    echo "- [$reg]($reg)" >> "$INDEX"
-                done
+                # Other repos may have numbered docs/, APIs/, APIs/schemas/, examples/
+                else
+                    if [ -d docs ]; then
+                        INDEX_DOCS="docs/$INDEX"
+                        echo -e "\n## Documentation for $label $dirname\n" >> "$INDEX"
+                        echo -e "## Documentation for $label $dirname\n" >> "$INDEX_DOCS"
+                        for doc in docs/[1-9]*.md; do
+                            add_numbered_doc "$doc"
+                        done
+                    fi
 
-            # NMOS-TESTING has numbered docs in docs/
-            elif [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
-                if [ -d docs ]; then
-                    INDEX_DOCS="docs/$INDEX"
-                    for doc in docs/[1-9]*.md; do
-                        add_numbered_doc "$doc"
-                    done
+                    if [ -d APIs ]; then
+                        INDEX_APIS="APIs/$INDEX"
+                        echo -e "\n## APIs for $label $dirname\n" >> "$INDEX"
+                        echo -e "## APIs for $label $dirname\n" > "$INDEX_APIS"
+                        for api in APIs/*.html; do
+                            no_ext="${api%%.html}"
+                            linktext="${no_ext##*/}"
+                            echo "- [$linktext](${api##*/})" >> "$INDEX_APIS"
+                            echo "- [$linktext]($api)" >> "$INDEX"
+                        done
+                    fi
+
+                    if [ -d APIs/schemas ]; then
+                        INDEX_SCHEMAS="APIs/schemas/$INDEX"
+                        echo -e "\n### [JSON Schemas](APIs/schemas/)\n" >> "$INDEX"
+                        echo -e "## JSON Schemas for $label $dirname\n" > "$INDEX_SCHEMAS"
+                        for schema in APIs/schemas/with-refs/*.html; do
+                            no_ext="${schema%%.html}"
+                            linktext="${no_ext##*/}"
+                            echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
+                        done
+                    fi
+
+                    if [ -d examples ]; then
+                        INDEX_EXAMPLES="examples/$INDEX"
+                        echo -e "\n### [Examples](examples/)\n" >> "$INDEX"
+                        echo -e "## Examples for $label $dirname\n" > "$INDEX_EXAMPLES"
+                        for example in examples/*.html; do
+                            no_ext="${example%%.html}"
+                            linktext="${no_ext##*/}"
+                            echo "- [$linktext](${example##*/})" >> "$INDEX_EXAMPLES"
+                        done
+                    fi
+
                 fi
-
-            # Other repos may have numbered docs/, APIs/, APIs/schemas/, examples/
-            else
-                if [ -d docs ]; then
-                    INDEX_DOCS="docs/$INDEX"
-                    echo -e "\n## Documentation for $label $dirname\n" >> "$INDEX"
-                    echo -e "## Documentation for $label $dirname\n" >> "$INDEX_DOCS"
-                    for doc in docs/[1-9]*.md; do
-                        add_numbered_doc "$doc"
-                    done
-                fi
-
-                if [ -d APIs ]; then
-                    INDEX_APIS="APIs/$INDEX"
-                    echo -e "\n## APIs for $label $dirname\n" >> "$INDEX"
-                    echo -e "## APIs for $label $dirname\n" > "$INDEX_APIS"
-                    for api in APIs/*.html; do
-                        no_ext="${api%%.html}"
-                        linktext="${no_ext##*/}"
-                        echo "- [$linktext](${api##*/})" >> "$INDEX_APIS"
-                        echo "- [$linktext]($api)" >> "$INDEX"
-                    done
-                fi
-
-                if [ -d APIs/schemas ]; then
-                    INDEX_SCHEMAS="APIs/schemas/$INDEX"
-                    echo -e "\n### [JSON Schemas](APIs/schemas/)\n" >> "$INDEX"
-                    echo -e "## JSON Schemas for $label $dirname\n" > "$INDEX_SCHEMAS"
-                    for schema in APIs/schemas/with-refs/*.html; do
-                        no_ext="${schema%%.html}"
-                        linktext="${no_ext##*/}"
-                        echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
-                    done
-                fi
-
-                if [ -d examples ]; then
-                    INDEX_EXAMPLES="examples/$INDEX"
-                    echo -e "\n### [Examples](examples/)\n" >> "$INDEX"
-                    echo -e "## Examples for $label $dirname\n" > "$INDEX_EXAMPLES"
-                    for example in examples/*.html; do
-                        no_ext="${example%%.html}"
-                        linktext="${no_ext##*/}"
-                        echo "- [$linktext](${example##*/})" >> "$INDEX_EXAMPLES"
-                    done
-                fi
-
-            fi
-
-            cd ..
-    done
-    cd ..
+            )
+        done
+    )
 }
 
 do_b_or_t branches branch
