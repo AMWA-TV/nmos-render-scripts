@@ -32,7 +32,7 @@ function make_label {
     label="${label//%20/ }"                   
     label="${label/#*([0-9.]) /}"
     # label="${label/#* - /}"
-    echo $label
+    echo "$label"
  }
 
 function add_nav_links {
@@ -42,11 +42,11 @@ function add_nav_links {
     local string=
 
     if [[ -n "$prev" ]]; then
-        string+="[←$(make_label $prev) ]($prev) · "
+        string+="[←$(make_label "$prev") ]($prev) · "
     fi
     string+="[ Index↑ ](..)"
     if [[ -n "$next" ]]; then
-        string+=" · [$(make_label $next)→]($next)"
+        string+=" · [$(make_label "$next")→]($next)"
     fi
     # this assumes there is the main heading on line 1 and line 2 is either blank or {:no_toc}
     sed -i -e "3i$string\\n" -e "\$a\\\n$string" "$file"
@@ -67,9 +67,9 @@ function extract {
             git clone https://github.com/AMWA-TV/nmos.wiki
 
             function get_wiki_doc {
-                echo "# $2" > $1
+                echo "# $2" > "$1"
                 # Strip off table of contents comments
-                sed 's~^\[//\]:.*~~' nmos.wiki/$1 >> $1
+                sed 's~^\[//\]:.*~~' "nmos.wiki/$1" >> "$1"
             }
             get_wiki_doc FAQ.md "NMOS FAQ"
             get_wiki_doc Glossary.md "NMOS Glossary"
@@ -80,7 +80,7 @@ function extract {
 
         # These repos have docs in the main dir, not docs/
         if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
-            cp *.md "../$target_dir"
+            cp -- *.md "../$target_dir"
             if [ -d images ] ; then
                 cp -r images "../$target_dir" 
             fi
@@ -122,12 +122,12 @@ function extract {
                         mkdir with-refs resolved
                         for i in *.json; do
                             echo "Resolving schema references for $i"
-                            if ! resolve-schema.py $i > resolved/$i ; then
+                            if ! resolve-schema.py "$i" > "resolved/$i" ; then
                                 echo "WARNING: Resolving failed: resolved/$i may include \$refs"
-                                cp $i resolved/$i
+                                cp "$i" "resolved/$i"
                             fi
-                            mv $i with-refs/
-                            cp resolved/$i $i
+                            mv "$i" with-refs/
+                            cp "resolved/$i" "$i"
                         done
                         cd ..
                     for i in *.raml; do
@@ -139,15 +139,15 @@ layout: default
 title: API $i
 ---
 EOF
-                    if grep -q '^#%RAML *0.8' $i; then
+                    if grep -q '^#%RAML *0.8' "$i"; then
                             echo "Warning: relabelling RAML 0.8 as 1.0"
-                            perl -pi.bak -e 's/^#%RAML *0\.8/#%RAML 1.0/' $i
+                            perl -pi.bak -e 's/^#%RAML *0\.8/#%RAML 1.0/' "$i"
                         fi
-                        raml2html --theme raml2html-nmos-theme $i >> "$HTML_API"
-                        [ -e $i.bak ] && mv $i.bak $i # Otherwise next checkout will fail
+                        raml2html --theme raml2html-nmos-theme "$i" >> "$HTML_API"
+                        [ -e "$i.bak" ] && mv "$i.bak" "$i" # Otherwise next checkout will fail
                     done
                     mkdir "../../$target_dir/APIs"
-                    mv *.html "../../$target_dir/APIs/"
+                    mv -- *.html "../../$target_dir/APIs/"
                     cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/"
 
                     if [ -d schemas ]; then
@@ -187,11 +187,11 @@ EOF
                         flat=${i//*\//}
                         HTML_EXAMPLE=${flat%%.json}.html 
                         echo "Rendering $HTML_EXAMPLE from $i..." 
-                        render-json.sh -n $i "Example ${i##*/}" >> "$HTML_EXAMPLE"
+                        render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
                     done
                     echo "Moving examples..."
                     mkdir "../../$target_dir/examples"
-                    mv *.html "../../$target_dir/examples"
+                    mv -- *.html "../../$target_dir/examples"
                     cp ../../.scripts/json-formatter.js "../../$target_dir/examples"
                     cp -r ../../.scripts/codemirror "../../$target_dir/examples"
                 cd ..
@@ -205,7 +205,7 @@ for branch in $(cd source-repo; git branch -r | sed 's:origin/::' | grep -v HEAD
     if [[ "$branch" =~ $SHOW_BRANCHES ]]; then
         extract "$branch" "branches/$branch"
     else
-        echo Skipping branch $branch
+        echo Skipping branch "$branch"
     fi
 done
 
@@ -218,7 +218,7 @@ if [[ "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
         if [[ "$tag" =~ $SHOW_TAGS ]]; then
             extract "tags/$tag" "tags/$tag"
         else
-            echo Skipping tag $tag
+            echo Skipping tag "$tag"
         fi
     done
 fi

@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-. $(dirname ${BASH_SOURCE[0]})/get-config.sh
+# shellcheck source=get-config.sh
+. "$(dirname "${BASH_SOURCE[0]}")/get-config.sh"
 
 set -o errexit
 
@@ -191,9 +192,11 @@ cat << EOF > "$INDEX"
 EOF
 
 # Repo-specific About: section...
-echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n" >> "$INDEX"
-cat "$INTRO" >> "$INDEX"
-echo -e "\n\n---\n\n" >> "$INDEX"
+{ 
+    echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n"
+    cat "$INTRO"
+    echo -e "\n\n---\n\n"
+} >> "$INDEX"
 
 # Heading/intro depends on repo type
 if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-003" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
@@ -223,7 +226,7 @@ if [[ ! "$AMWA_ID" =~ "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BC
     echo "## Development Branches" > "$INDEX_BRANCHES"
     echo -e "\n## Development Branches" >> "$INDEX"
     for dir in branches/*; do
-        [ ! -d $dir ] && continue
+        [ ! -d "$dir" ] && continue
         branch="${dir##*/}"
         echo -e "\n[$branch](branches/$branch/)" >>  "$INDEX"
         echo -e "\n[$branch]($branch/)" >>  "$INDEX_BRANCHES"
@@ -234,7 +237,7 @@ if [[ ! "$AMWA_ID" =~ "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BC
     echo "## Published Releases/Tags" > "$INDEX_TAGS"
     echo -e "\n##  Published Releases/Tags" >> "$INDEX"
     for dir in tags/*; do
-        [ ! -d $dir ] && continue
+        [ ! -d "$dir" ] && continue
         tag="${dir##*/}"
         echo -e "\n[$tag](tags/$tag/)" >>  "$INDEX"
         echo -e "\n[$tag]($tag/)" >>  "$INDEX_TAGS"
