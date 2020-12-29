@@ -13,6 +13,6 @@ jobs:
       - name: Install flake8
         run: pip3 install flake8
       - name: Install shellcheck
-        run: apt install shellcheck
+        run: sudo apt install shellcheck
       - name: Lint
         run: flake8 .
