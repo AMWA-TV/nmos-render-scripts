@@ -15,4 +15,5 @@ jobs:
       - name: Install shellcheck
         run: sudo apt install shellcheck
       - name: Lint
-        run: flake8 .
+        run: make lint
+        
