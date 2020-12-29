@@ -59,7 +59,8 @@ function extract {
     echo "Extracting $checkout into $target_dir"
     mkdir "$target_dir"
 
-    cd source-repo
+    (
+        cd source-repo || exit 1
         git checkout "$checkout"
 
         # NMOS gets copies of some wiki docs
@@ -85,40 +86,43 @@ function extract {
                 cp -r images "../$target_dir" 
             fi
 
-        # NMOS-PARAMETER-REGISTERS has individual dir for each register
-        elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-            cp -r common device-control-types device-types formats node-service-types tags transports "../$target_dir"
+            # NMOS-PARAMETER-REGISTERS has individual dir for each register
+            elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+                cp -r common device-control-types device-types formats node-service-types tags transports "../$target_dir"
 
-        # Other repos have some or all of docs/, APIs/, examples/
-        else
-            if [ -d docs ]; then
-                cd docs
-                mkdir "../../$target_dir/docs"
-                prev_file=
-                prev_link=
-                prevprev_link=
-                for i in [1-9]*.md; do
-                    cp "$i" "../../$target_dir/docs"
-                    this_file="../../$target_dir/docs/$i"
-                    this_link="${i// /%20}" # so links look like they do on github.com -- fixlinks.sh converts to underscore
-                    if [ -n "$prev_file" ]; then
-                        add_nav_links "$prevprev_link" "$this_link" "$prev_file" 
+            # Other repos have some or all of docs/, APIs/, examples/
+            else
+                if [ -d docs ]; then
+                (
+                    cd docs || exit 1
+                    mkdir "../../$target_dir/docs"
+                    prev_file=
+                    prev_link=
+                    prevprev_link=
+                    for i in [1-9]*.md; do
+                        cp "$i" "../../$target_dir/docs"
+                        this_file="../../$target_dir/docs/$i"
+                        this_link="${i// /%20}" # so links look like they do on github.com -- fixlinks.sh converts to underscore
+                        if [ -n "$prev_file" ]; then
+                            add_nav_links "$prevprev_link" "$this_link" "$prev_file" 
+                        fi
+                        prevprev_link="$prev_link"
+                        prev_file="$this_file"
+                        prev_link="$this_link"
+                    done
+                    add_nav_links "$prevprev_link" "" "$this_file" # Last one has no next; singleton has no previous either
+
+                    if [ -d images ] ; then
+                        cp -r images "../../$target_dir/docs" 
                     fi
-                    prevprev_link="$prev_link"
-                    prev_file="$this_file"
-                    prev_link="$this_link"
-                done
-                add_nav_links "$prevprev_link" "" "$this_file" # Last one has no next; singleton has no previous either
-
-                if [ -d images ] ; then
-                    cp -r images "../../$target_dir/docs" 
+                )
                 fi
-            cd ..
-            fi
 
-            if [ -d APIs ]; then
-                cd APIs
-                    cd schemas
+                if [ -d APIs ]; then
+                (
+                    cd APIs || exit 1
+                    (
+                        cd schemas || exit 1
                         mkdir with-refs resolved
                         for i in *.json; do
                             echo "Resolving schema references for $i"
@@ -129,7 +133,7 @@ function extract {
                             mv "$i" with-refs/
                             cp "resolved/$i" "$i"
                         done
-                        cd ..
+                    )
                     for i in *.raml; do
                         HTML_API=${i%%.raml}.html
                         echo "Generating $HTML_API from $i..."
@@ -139,7 +143,7 @@ layout: default
 title: API $i
 ---
 EOF
-                    if grep -q '^#%RAML *0.8' "$i"; then
+                        if grep -q '^#%RAML *0.8' "$i"; then
                             echo "Warning: relabelling RAML 0.8 as 1.0"
                             perl -pi.bak -e 's/^#%RAML *0\.8/#%RAML 1.0/' "$i"
                         fi
@@ -178,26 +182,27 @@ EOF
                         mv schemas/with-refs/*.json schemas/ 
                         rm -rf schemas/with-refs schemas/resolved
                     fi
-                    cd ..
-            fi
-            if [ -d examples ]; then
-                echo "Rendering examples..."
-                cd examples
-                    for i in **/*.json; do
-                        flat=${i//*\//}
-                        HTML_EXAMPLE=${flat%%.json}.html 
-                        echo "Rendering $HTML_EXAMPLE from $i..." 
-                        render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
-                    done
-                    echo "Moving examples..."
-                    mkdir "../../$target_dir/examples"
-                    mv -- *.html "../../$target_dir/examples"
-                    cp ../../.scripts/json-formatter.js "../../$target_dir/examples"
-                    cp -r ../../.scripts/codemirror "../../$target_dir/examples"
-                cd ..
-            fi
-        fi
-    cd ..
+                ) # APIs
+                fi
+                if [ -d examples ]; then
+                (
+                    echo "Rendering examples..."
+                    cd examples || exit 1
+                        for i in **/*.json; do
+                            flat=${i//*\//}
+                            HTML_EXAMPLE=${flat%%.json}.html 
+                            echo "Rendering $HTML_EXAMPLE from $i..." 
+                            render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
+                        done
+                        echo "Moving examples..."
+                        mkdir "../../$target_dir/examples"
+                        mv -- *.html "../../$target_dir/examples"
+                        cp ../../.scripts/json-formatter.js "../../$target_dir/examples"
+                        cp -r ../../.scripts/codemirror "../../$target_dir/examples"
+                )
+                fi
+        fi # AMWA_ID
+    )
 }
 
 mkdir branches
