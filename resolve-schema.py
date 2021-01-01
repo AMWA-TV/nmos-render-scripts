@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
-import getopt, sys, os
+import sys
+import os
 import jsonref
 from pathlib import Path
 import json
 
 # This is from TestHelper.py in nmos-testing
+
 
 def load_resolved_schema(spec_path, file_name=None, schema_obj=None, path_prefix=True):
     """
@@ -48,6 +50,7 @@ def main():
         sys.exit(2)
 
     print(json.dumps(load_resolved_schema(".", sys.argv[1], path_prefix=False), indent=4, sort_keys=True))
+
 
 if __name__ == "__main__":
     main()
