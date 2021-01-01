@@ -15,7 +15,7 @@
 # limitations under the License.
 
 set -o errexit
-shopt -s extglob globstar
+shopt -s extglob globstar nullglob
 
 PATH=$PWD/.scripts:$PWD/node_modules/.bin:$PATH
 
@@ -152,6 +152,7 @@ EOF
                     done
                     mkdir "../../$target_dir/APIs"
                     mv -- *.html "../../$target_dir/APIs/"
+
                     cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/"
 
                     if [ -d schemas ]; then
@@ -172,14 +173,20 @@ EOF
                         mkdir "../../$target_dir/APIs/schemas/with-refs"
                         cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/with-refs"
                         cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/with-refs"
-                        mv schemas/with-refs/*.html "../../$target_dir/APIs/schemas/with-refs"
+                        for i in schemas/with-refs/*.html; do
+                            mv $i "../../$target_dir/APIs/schemas/with-refs"
+                        done
                         mkdir "../../$target_dir/APIs/schemas/resolved"
                         cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/resolved"
                         cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/resolved"
-                        mv schemas/resolved/*.html "../../$target_dir/APIs/schemas/resolved"
+                        for i in schemas/resolved/*.html; do
+                            mv $i "../../$target_dir/APIs/schemas/resolved"
+                        done
                         echo "Tidying..."
                         # Restore things how they were to ensure next checkout doesn't overwrite
-                        mv schemas/with-refs/*.json schemas/ 
+                        for i in schemas/with-refs/*.json; do
+                            mv $i schemas/ 
+                        done
                         rm -rf schemas/with-refs schemas/resolved
                     fi
                 ) # APIs
