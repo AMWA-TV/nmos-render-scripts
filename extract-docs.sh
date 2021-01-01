@@ -174,18 +174,18 @@ EOF
                         cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/with-refs"
                         cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/with-refs"
                         for i in schemas/with-refs/*.html; do
-                            mv $i "../../$target_dir/APIs/schemas/with-refs"
+                            mv "$i" "../../$target_dir/APIs/schemas/with-refs"
                         done
                         mkdir "../../$target_dir/APIs/schemas/resolved"
                         cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/resolved"
                         cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/resolved"
                         for i in schemas/resolved/*.html; do
-                            mv $i "../../$target_dir/APIs/schemas/resolved"
+                            mv "$i" "../../$target_dir/APIs/schemas/resolved"
                         done
                         echo "Tidying..."
                         # Restore things how they were to ensure next checkout doesn't overwrite
                         for i in schemas/with-refs/*.json; do
-                            mv $i schemas/ 
+                            mv "$i" schemas/ 
                         done
                         rm -rf schemas/with-refs schemas/resolved
                     fi
