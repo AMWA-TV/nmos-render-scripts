@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2034
+# ^Unused variable warning: most of the variables are used in sourcing file
+
 # This file is sourced from build scripts
 # It now pulls in settings from _config.yml
 # TODO: just read _config.yml once!

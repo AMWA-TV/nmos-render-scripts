@@ -32,7 +32,7 @@ function make_label {
     label="${label//%20/ }"                   
     label="${label/#*([0-9.]) /}"
     # label="${label/#* - /}"
-    echo $label
+    echo "$label"
  }
 
 function add_nav_links {
@@ -42,11 +42,11 @@ function add_nav_links {
     local string=
 
     if [[ -n "$prev" ]]; then
-        string+="[←$(make_label $prev) ]($prev) · "
+        string+="[←$(make_label "$prev") ]($prev) · "
     fi
     string+="[ Index↑ ](..)"
     if [[ -n "$next" ]]; then
-        string+=" · [$(make_label $next)→]($next)"
+        string+=" · [$(make_label "$next")→]($next)"
     fi
     # this assumes there is the main heading on line 1 and line 2 is either blank or {:no_toc}
     sed -i -e "3i$string\\n" -e "\$a\\\n$string" "$file"
@@ -59,7 +59,8 @@ function extract {
     echo "Extracting $checkout into $target_dir"
     mkdir "$target_dir"
 
-    cd source-repo
+    (
+        cd source-repo || exit 1
         git checkout "$checkout"
 
         # NMOS gets copies of some wiki docs
@@ -67,9 +68,9 @@ function extract {
             git clone https://github.com/AMWA-TV/nmos.wiki
 
             function get_wiki_doc {
-                echo "# $2" > $1
+                echo "# $2" > "$1"
                 # Strip off table of contents comments
-                sed 's~^\[//\]:.*~~' nmos.wiki/$1 >> $1
+                sed 's~^\[//\]:.*~~' "nmos.wiki/$1" >> "$1"
             }
             get_wiki_doc FAQ.md "NMOS FAQ"
             get_wiki_doc Glossary.md "NMOS Glossary"
@@ -80,58 +81,59 @@ function extract {
 
         # These repos have docs in the main dir, not docs/
         if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
-            cp *.md "../$target_dir"
+            cp -- *.md "../$target_dir"
             if [ -d images ] ; then
                 cp -r images "../$target_dir" 
             fi
 
-        # NMOS-PARAMETER-REGISTERS has individual dir for each register
-        elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-            for register in common device-control-types device-types formats node-service-types tags transports capabilities; do
-                [[ -d $register ]] && cp -r $register "../$target_dir"
-            done
+            # NMOS-PARAMETER-REGISTERS has individual dir for each register
+            elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+                cp -r common device-control-types device-types formats node-service-types tags transports "../$target_dir"
 
-        # Other repos have some or all of docs/, APIs/, examples/
-        else
-            if [ -d docs ]; then
-                cd docs
-                mkdir "../../$target_dir/docs"
-                prev_file=
-                prev_link=
-                prevprev_link=
-                for i in [1-9]*.md; do
-                    cp "$i" "../../$target_dir/docs"
-                    this_file="../../$target_dir/docs/$i"
-                    this_link="${i// /%20}" # so links look like they do on github.com -- fixlinks.sh converts to underscore
-                    if [ -n "$prev_file" ]; then
-                        add_nav_links "$prevprev_link" "$this_link" "$prev_file" 
+            # Other repos have some or all of docs/, APIs/, examples/
+            else
+                if [ -d docs ]; then
+                (
+                    cd docs || exit 1
+                    mkdir "../../$target_dir/docs"
+                    prev_file=
+                    prev_link=
+                    prevprev_link=
+                    for i in [1-9]*.md; do
+                        cp "$i" "../../$target_dir/docs"
+                        this_file="../../$target_dir/docs/$i"
+                        this_link="${i// /%20}" # so links look like they do on github.com -- fixlinks.sh converts to underscore
+                        if [ -n "$prev_file" ]; then
+                            add_nav_links "$prevprev_link" "$this_link" "$prev_file" 
+                        fi
+                        prevprev_link="$prev_link"
+                        prev_file="$this_file"
+                        prev_link="$this_link"
+                    done
+                    add_nav_links "$prevprev_link" "" "$this_file" # Last one has no next; singleton has no previous either
+
+                    if [ -d images ] ; then
+                        cp -r images "../../$target_dir/docs" 
                     fi
-                    prevprev_link="$prev_link"
-                    prev_file="$this_file"
-                    prev_link="$this_link"
-                done
-                add_nav_links "$prevprev_link" "" "$this_file" # Last one has no next; singleton has no previous either
-
-                if [ -d images ] ; then
-                    cp -r images "../../$target_dir/docs" 
+                )
                 fi
-            cd ..
-            fi
 
-            if [ -d APIs ]; then
-                cd APIs
-                    cd schemas
+                if [ -d APIs ]; then
+                (
+                    cd APIs || exit 1
+                    (
+                        cd schemas || exit 1
                         mkdir with-refs resolved
                         for i in *.json; do
                             echo "Resolving schema references for $i"
-                            if ! resolve-schema.py $i > resolved/$i ; then
+                            if ! resolve-schema.py "$i" > "resolved/$i" ; then
                                 echo "WARNING: Resolving failed: resolved/$i may include \$refs"
-                                cp $i resolved/$i
+                                cp "$i" "resolved/$i"
                             fi
-                            mv $i with-refs/
-                            cp resolved/$i $i
+                            mv "$i" with-refs/
+                            cp "resolved/$i" "$i"
                         done
-                        cd ..
+                    )
                     for i in *.raml; do
                         HTML_API=${i%%.raml}.html
                         echo "Generating $HTML_API from $i..."
@@ -141,17 +143,16 @@ layout: default
 title: API $i
 ---
 EOF
-                    if grep -q '^#%RAML *0.8' $i; then
+                        if grep -q '^#%RAML *0.8' "$i"; then
                             echo "Warning: relabelling RAML 0.8 as 1.0"
-                            perl -pi.bak -e 's/^#%RAML *0\.8/#%RAML 1.0/' $i
+                            perl -pi.bak -e 's/^#%RAML *0\.8/#%RAML 1.0/' "$i"
                         fi
-                        raml2html --theme raml2html-nmos-theme $i >> "$HTML_API"
-                        [ -e $i.bak ] && mv $i.bak $i # Otherwise next checkout will fail
+                        raml2html --theme raml2html-nmos-theme "$i" >> "$HTML_API"
+                        [ -e "$i.bak" ] && mv "$i.bak" "$i" # Otherwise next checkout will fail
                     done
                     mkdir "../../$target_dir/APIs"
-                    for i in *.html; do
-                        mv $i "../../$target_dir/APIs/"
-                    done
+                    mv -- *.html "../../$target_dir/APIs/"
+
                     cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/"
 
                     if [ -d schemas ]; then
@@ -173,43 +174,42 @@ EOF
                         cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/with-refs"
                         cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/with-refs"
                         for i in schemas/with-refs/*.html; do
-                            mv $i "../../$target_dir/APIs/schemas/with-refs"
+                            mv "$i" "../../$target_dir/APIs/schemas/with-refs"
                         done
                         mkdir "../../$target_dir/APIs/schemas/resolved"
                         cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/resolved"
                         cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/resolved"
                         for i in schemas/resolved/*.html; do
-                            mv $i "../../$target_dir/APIs/schemas/resolved"
+                            mv "$i" "../../$target_dir/APIs/schemas/resolved"
                         done
                         echo "Tidying..."
                         # Restore things how they were to ensure next checkout doesn't overwrite
                         for i in schemas/with-refs/*.json; do
-                            mv $i schemas/ 
+                            mv "$i" schemas/ 
                         done
                         rm -rf schemas/with-refs schemas/resolved
                     fi
-                    cd ..
-            fi
-            if [ -d examples ]; then
-                echo "Rendering examples..."
-                cd examples
-                    for i in **/*.json; do
-                        flat=${i//*\//}
-                        HTML_EXAMPLE=${flat%%.json}.html 
-                        echo "Rendering $HTML_EXAMPLE from $i..." 
-                        render-json.sh -n $i "Example ${i##*/}" >> "$HTML_EXAMPLE"
-                    done
-                    echo "Moving examples..."
-                    mkdir "../../$target_dir/examples"
-                    for i in *.html; do
-                        mv $i "../../$target_dir/examples"
-                    done
-                    cp ../../.scripts/json-formatter.js "../../$target_dir/examples"
-                    cp -r ../../.scripts/codemirror "../../$target_dir/examples"
-                cd ..
-            fi
-        fi
-    cd ..
+                ) # APIs
+                fi
+                if [ -d examples ]; then
+                (
+                    echo "Rendering examples..."
+                    cd examples || exit 1
+                        for i in **/*.json; do
+                            flat=${i//*\//}
+                            HTML_EXAMPLE=${flat%%.json}.html 
+                            echo "Rendering $HTML_EXAMPLE from $i..." 
+                            render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
+                        done
+                        echo "Moving examples..."
+                        mkdir "../../$target_dir/examples"
+                        mv -- *.html "../../$target_dir/examples"
+                        cp ../../.scripts/json-formatter.js "../../$target_dir/examples"
+                        cp -r ../../.scripts/codemirror "../../$target_dir/examples"
+                )
+                fi
+        fi # AMWA_ID
+    )
 }
 
 mkdir branches
@@ -217,7 +217,7 @@ for branch in $(cd source-repo; git branch -r | sed 's:origin/::' | grep -v HEAD
     if [[ "$branch" =~ $SHOW_BRANCHES ]]; then
         extract "$branch" "branches/$branch"
     else
-        echo Skipping branch $branch
+        echo Skipping branch "$branch"
     fi
 done
 
@@ -230,7 +230,7 @@ if [[ "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
         if [[ "$tag" =~ $SHOW_TAGS ]]; then
             extract "tags/$tag" "tags/$tag"
         else
-            echo Skipping tag $tag
+            echo Skipping tag "$tag"
         fi
     done
 fi

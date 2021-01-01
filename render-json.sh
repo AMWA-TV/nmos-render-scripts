@@ -16,7 +16,7 @@
 
 set -o errexit
 
-if [ $1 == "-n" ]; then
+if [ "$1" == "-n" ]; then
     SHOW_LINE_NUMBERS=true
     shift
 else
@@ -53,7 +53,7 @@ cat <<EOF
 <div id="json-render">
 EOF
 
-if $LINT $JSON_FILE ; then
+if $LINT "$JSON_FILE" ; then
 
     cat <<-EOF
 <script type="text/javascript" src="codemirror/lib/codemirror.js"></script>
@@ -76,7 +76,7 @@ if $LINT $JSON_FILE ; then
 <textarea id="mytextarea">
 EOF
 
-    cat $JSON_FILE # My JSON
+    cat "$JSON_FILE" # My JSON
     cat <<-EOF
 </textarea>
 <script>
@@ -124,7 +124,7 @@ EOF
 
 else # Failed lint so do minimal render
     echo "<pre>"
-    cat $JSON_FILE
+    cat "$JSON_FILE"
     echo "</pre>"
 fi
 

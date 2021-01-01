@@ -18,6 +18,7 @@ set -o errexit
 
 shopt -s nullglob
 
+# shellcheck source=get-config.sh
 . .scripts/get-config.sh
 
 echo "Fixing links in documents"
@@ -67,12 +68,12 @@ fi
 if [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
 
     function rewrite_link {
-        perl -pi -e "s~\]\($1~]($2~g;" $3
-    }
+        perl -pi -e "s~\]\($1~]($2~g;" "$3"
+   }
 
     for tree in {branches,tags}/*; do
         linkto="$REPO_ADDRESS/blob/${tree##*/}"
-        cd $tree
+        cd "$tree"
             for file in docs/*.md; do
                 rewrite_link "../testssl/" "${linkto}/testssl/" "$file"
                 rewrite_link "../test_data/" "${linkto}/test_data/" "$file"
