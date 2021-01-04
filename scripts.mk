@@ -17,6 +17,9 @@ fix-links:
 layouts:
 	.scripts/make-layouts.sh
 
+site:
+	.scripts/make-site.sh
+
 server:
 	.scripts/run-server.sh
 
