@@ -18,3 +18,4 @@ git clone https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/raml2html-
 cp .scripts/package.json .
 yarn install
 pip3 install setuptools jsonref pathlib
+bundle install
