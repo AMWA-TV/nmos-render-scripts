@@ -20,6 +20,9 @@ layouts:
 site:
 	.scripts/make-site.sh
 
+upload:
+	.scripts/upload-site.sh
+
 server:
 	.scripts/run-server.sh
 
