@@ -20,10 +20,11 @@ echo "$SSH_KNOWN_HOSTS" > .ssh/known_hosts && chmod 600 .ssh/known_hosts
 ssh_opts='-i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts'
 
 echo Uploading
-scp "$ssh_opts" -r _site "$SSH_USER@$SSH_HOST:$dest.new"
+scp -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts -r _site "$SSH_USER@$SSH_HOST:$dest.new"
 
 echo Replacing old site
 # shellcheck disable=SC2029
-ssh "$ssh_opts" "$SSH_USER@$SSH_HOST" "mv $dest $dest.old ; mv $dest.new $dest; rm -rf $dest.old"
+ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" \
+    "mv $dest $dest.old ; mv $dest.new $dest; rm -rf $dest.old"
 
 echo "Site is https://$SPEC_SERVER/$SITE_NAME"
