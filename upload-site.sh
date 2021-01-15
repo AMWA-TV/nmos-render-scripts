@@ -17,7 +17,7 @@ chmod 700 .ssh
 echo "$SSH_PRIVATE_KEY" > .ssh/id_rsa && chmod 600 .ssh/id_rsa
 echo "$SSH_KNOWN_HOSTS" > .ssh/known_hosts && chmod 600 .ssh/known_hosts
 
-ssh_opts="-i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts"
+ssh_opts='-i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts'
 
 echo Uploading
 scp "$ssh_opts" -r _site "$SSH_USER@$SSH_HOST:$dest.new"
