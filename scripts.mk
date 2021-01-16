@@ -1,6 +1,6 @@
-.PHONY: build source-repo docs indexes fix-links layouts server push clean
+.PHONY: build source-repo docs indexes fix-links layouts site upload server clean
 
-build: source-repo docs indexes fix-links layouts
+build: source-repo docs indexes fix-links layouts site
 
 source-repo:
 	.scripts/get-source-repo.sh
@@ -25,9 +25,6 @@ upload:
 
 server:
 	.scripts/run-server.sh
-
-push:
-	.scripts/push-to-github.sh
 
 clean:
 	.scripts/make-clean.sh
