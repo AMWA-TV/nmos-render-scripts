@@ -1,6 +1,6 @@
-.PHONY: build source-repo docs indexes fix-links layouts site upload server clean
+.PHONY: build source-repo docs indexes fix-links layouts site rewrites upload server clean
 
-build: source-repo docs indexes fix-links layouts site
+build: source-repo docs indexes fix-links layouts site rewrites
 
 source-repo:
 	.scripts/get-source-repo.sh
@@ -19,6 +19,9 @@ layouts:
 
 site:
 	.scripts/make-site.sh
+
+rewrites:
+	.scripts/make-rewrites.sh
 
 upload:
 	.scripts/upload-site.sh
