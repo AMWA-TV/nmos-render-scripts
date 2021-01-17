@@ -18,14 +18,14 @@ echo "$SSH_PRIVATE_KEY" > .ssh/id_rsa && chmod 600 .ssh/id_rsa
 echo "$SSH_KNOWN_HOSTS" > .ssh/known_hosts && chmod 600 .ssh/known_hosts
 
 echo Making tar
-tar -czf $SITE_NAME.tar.gz _site
+tar -czf "$SITE_NAME.tar.gz" _site
 
 echo Making destination directory
 ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" \
     "mkdir $dest.new"
 
 echo Uploading
-scp -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts $SITE_NAME.tar.gz "$SSH_USER@$SSH_HOST:$dest.new/"
+scp -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SITE_NAME.tar.gz" "$SSH_USER@$SSH_HOST:$dest.new/"
 
 echo Extracting
 ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" \
