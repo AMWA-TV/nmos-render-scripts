@@ -20,20 +20,19 @@ echo "$SSH_KNOWN_HOSTS" > .ssh/known_hosts && chmod 600 .ssh/known_hosts
 echo Making tar
 tar -czf "$SITE_NAME.tar.gz" _site
 
+function do_ssh {
+ ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" "$@"
+}
 echo Making destination directory
-ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" \
-    "mkdir $dest.new"
+do_ssh "mkdir $dest.new"
 
 echo Uploading
 scp -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SITE_NAME.tar.gz" "$SSH_USER@$SSH_HOST:$dest.new/"
 
 echo Extracting
-ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" \
-    "cd $dest.new && tar --strip-components=1 -xf $SITE_NAME.tar.gz"
+do_ssh "cd $dest.new && tar --strip-components=1 -xf $SITE_NAME.tar.gz"
 
 echo Replacing old site
-# shellcheck disable=SC2029
-ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" \
-    "mv $dest $dest.old ; mv $dest.new $dest; rm -rf $dest.old"
+do_ssh "mv $dest $dest.old ; mv $dest.new $dest; rm -rf $dest.old"
 
 echo "Site is https://$SPEC_SERVER/$SITE_NAME"
