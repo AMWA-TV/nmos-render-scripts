@@ -21,7 +21,8 @@ echo Making tar
 tar -czf "$SITE_NAME.tar.gz" _site
 
 function do_ssh {
- ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" "$@"
+  # shellcheck disable=SC2029
+  ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" "$@"
 }
 echo Making destination directory
 do_ssh "mkdir $dest.new"
