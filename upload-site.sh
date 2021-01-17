@@ -36,4 +36,7 @@ do_ssh "cd $dest.new && tar --strip-components=1 -xf $SITE_NAME.tar.gz"
 echo Replacing old site
 do_ssh "mv $dest $dest.old ; mv $dest.new $dest; rm -rf $dest.old"
 
+echo Deleting tar file
+rm "$SITE_NAME.tar.gz"
+
 echo "Site is https://$SPEC_SERVER/$SITE_NAME"
