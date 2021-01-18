@@ -81,7 +81,9 @@ function extract {
 
         # These repos have docs in the main dir, not docs/
         if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
-            cp -- *.md "../$target_dir"
+            for i in *.md; do
+                cp "$i" "../$target_dir"
+            done
             if [ -d images ] ; then
                 cp -r images "../$target_dir" 
             fi
@@ -151,7 +153,9 @@ EOF
                         [ -e "$i.bak" ] && mv "$i.bak" "$i" # Otherwise next checkout will fail
                     done
                     mkdir "../../$target_dir/APIs"
-                    mv -- *.html "../../$target_dir/APIs/"
+                    for i in *.html; do
+                        mv "$i" "../../$target_dir/APIs/"
+                    done
 
                     cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/"
 
@@ -203,7 +207,9 @@ EOF
                         done
                         echo "Moving examples..."
                         mkdir "../../$target_dir/examples"
-                        mv -- *.html "../../$target_dir/examples"
+                        for i in *.html; do
+                            mv "$i" "../../$target_dir/examples"
+                        done
                         cp ../../.scripts/json-formatter.js "../../$target_dir/examples"
                         cp -r ../../.scripts/codemirror "../../$target_dir/examples"
                 )
