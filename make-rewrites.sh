@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -o errexit
+
+shopt -s nullglob
+
 # shellcheck source=get-config.sh
 . .scripts/get-config.sh
 
