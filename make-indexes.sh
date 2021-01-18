@@ -24,7 +24,7 @@ set -o errexit
 shopt -s nullglob
 
 # Text in this file will appear at the start of the top-level index
-INTRO=intro.md
+INTRO=../intro.md
 INTRO_COMMON=.scripts/intro_common.md
 
 # Filename for index in each dir
