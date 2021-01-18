@@ -7,9 +7,8 @@ set -o errexit
 # shellcheck source=get-config.sh
 . .scripts/get-config.sh
 
-
-# Many things only relate to IS- specs
-if [[ "$AMWA_ID" =~ "IS-" ]]; then
+# Just install these for specs that need them
+if [[ -d APIs ]]; then
     rm -rf raml2html-nmos-theme
     git clone https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/raml2html-nmos-theme
     cp .scripts/package.json .
@@ -18,5 +17,5 @@ if [[ "$AMWA_ID" =~ "IS-" ]]; then
     pip3 install jsonref pathlib
 fi
 
-# All specs need Jekull etc.
+# All specs need Jekyll
 bundle install
