@@ -231,7 +231,7 @@ done
 mkdir releases
 for tag in $(cd source-repo; git tag); do
     if [[ "$tag" =~ $SHOW_RELEASES ]]; then
-        extract "tags/$tag" "releases/$release"
+        extract "tags/$tag" "releases/$tag"
     else
         echo "Skipping tag/release $tag"
     fi
