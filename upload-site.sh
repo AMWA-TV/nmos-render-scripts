@@ -8,9 +8,11 @@
 dest="/var/www/$SPEC_SERVER/$SITE_NAME"
 
 if [[ -e .ssh ]]; then
-  echo Temp .ssh already exists: exiting
+  echo "Temp .ssh already exists: exiting for safety (check where you are running this from)"
   exit 1
 fi
+
+echo Setting up .ssh
 
 mkdir .ssh
 chmod 700 .ssh
@@ -38,5 +40,8 @@ do_ssh "mv $dest $dest.old ; mv $dest.new $dest; rm -rf $dest.old"
 
 echo Deleting tar file
 rm "$SITE_NAME.tar.gz"
+
+echo Deleting .ssh
+rm -rf .ssh
 
 echo "Site is https://$SPEC_SERVER/$SITE_NAME"
