@@ -80,13 +80,13 @@ function add_possibly_nested_example {
     echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
 };
 
-function do_b_or_t {
-    b_or_t=$1
-    label=$2
+function do_tree {
+    tree=$1
+    label=$2 # because of spelling of plurals
     
-    echo "Processing $b_or_t $INDEX..."
+    echo "Processing $tree $INDEX..."
     (
-        cd "$b_or_t" || exit 1
+        cd "$tree" || exit 1
         for dir in */; do
             dirname="${dir%%/}"
             echo "Making $dirname/$INDEX"
@@ -171,12 +171,8 @@ function do_b_or_t {
     )
 }
 
-do_b_or_t branches branch
-
-# NMOS-PARAMETER-REGISTERS has NO GIT TAGS (see comment in extract-docs.sh)
-if [[ "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
-    do_b_or_t tags release/tag
-fi
+do_tree branches branch
+do_tree releases release
 
 echo "Making top level $INDEX"
 
@@ -220,7 +216,7 @@ fi
 # TODO: DRY on the following...
 
 
-# These excluded repos don't have branch and tags indexes
+# These excluded repos don't have branch and releases indexes
 if [[ ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BCP-003" ]]; then
     echo Adding branches index...
     INDEX_BRANCHES="branches/index.md"
@@ -239,15 +235,15 @@ if [[ ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BC
         echo -e "\n[$branch]($branch/)" >>  "$INDEX_BRANCHES"
     done
 
-    echo Adding tags index...
-    INDEX_TAGS="tags/index.md"
-    echo "## Published Releases/Tags" > "$INDEX_TAGS"
-    echo -e "\n##  Published Releases/Tags" >> "$INDEX"
-    for dir in tags/*; do
+    echo Adding releases index...
+    INDEX_RELEASES="releases/index.md"
+    echo "## Published Releases" > "$INDEX_RELEASES"
+    echo -e "\n##  Published Releases" >> "$INDEX"
+    for dir in releases/*; do
         [ ! -d "$dir" ] && continue
-        tag="${dir##*/}"
-        echo -e "\n[$tag](tags/$tag/)" >>  "$INDEX"
-        echo -e "\n[$tag]($tag/)" >>  "$INDEX_TAGS"
+        release="${dir##*/}"
+        echo -e "\n[$release](releases/$release/)" >>  "$INDEX"
+        echo -e "\n[$release]($release/)" >>  "$INDEX_RELEASES"
     done
 
 fi

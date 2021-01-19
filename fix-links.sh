@@ -44,19 +44,19 @@ function process_file {
 
 # These repos have docs in the main dir, not docs/
 if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
-    for file in {branches,tags}/*/*.md index.md; do
+    for file in {branches,releases}/*/*.md index.md; do
         process_file "$file"
     done
 
 # NMOS-PARAMETER-REGISTERS has individual dir for each register
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-    for file in branches/*/*/*.md index.md; do  # NO GIT tags (see comment in extract-docs.sh)
+    for file in {branches,releases}/*/*/*.md index.md; do
         process_file "$file"
     done
 
 # Other repos have some or all of docs/, APIs/, examples/
 else
-    for file in {branches,tags}/*/docs/*.md; do
+    for file in {branches,releases}/*/docs/*.md; do
         process_file "$file"
     done
 fi
@@ -71,7 +71,7 @@ if [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
         perl -pi -e "s~\]\($1~]($2~g;" "$3"
    }
 
-    for tree in {branches,tags}/*; do
+    for tree in {branches,releases}/*; do
         linkto="$REPO_ADDRESS/blob/${tree##*/}"
         cd "$tree"
             for file in docs/*.md; do

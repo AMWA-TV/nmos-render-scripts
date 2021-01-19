@@ -21,12 +21,12 @@ if [[ -d branches ]]; then
     done
 fi
 
-if [[ -d tags ]]; then
-    echo Making tag rewrite rules
-    for t in tags/*; do
-        tag=${t#*/}
-        if [[ "$tag" =~ $SHOW_TAGS ]]; then
-            echo "RewriteRule ^$tag(.*) tags/$tag\$1" >> $HTACCESS
+if [[ -d releases ]]; then
+    echo Making release rewrite rules
+    for t in releases/*; do
+        release=${t#*/}
+        if [[ "$release" =~ $SHOW_RELEASES ]]; then
+            echo "RewriteRule ^$release(.*) releases/$release\$1" >> $HTACCESS
         fi
     done
 fi

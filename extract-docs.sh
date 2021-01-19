@@ -223,20 +223,16 @@ for branch in $(cd source-repo; git branch -r | sed 's:origin/::' | grep -v HEAD
     if [[ "$branch" =~ $SHOW_BRANCHES ]]; then
         extract "$branch" "branches/$branch"
     else
-        echo Skipping branch "$branch"
+        echo "Skipping branch $branch"
     fi
 done
 
-# Unfortunately NMOS-PARAMETER-REGISTERS already has a "tags" register, which has grabbed the /tags/ dir.
-# For now just skip in this case, but if we ever want to have releases of param-regs we'll need a better way...
-
-if [[ "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
-    mkdir tags
-    for tag in $(cd source-repo; git tag); do
-        if [[ "$tag" =~ $SHOW_TAGS ]]; then
-            extract "tags/$tag" "tags/$tag"
-        else
-            echo Skipping tag "$tag"
-        fi
-    done
-fi
+# tag means git tag, release means NMOS/GitHub release
+mkdir releases
+for tag in $(cd source-repo; git tag); do
+    if [[ "$tag" =~ $SHOW_RELEASES ]]; then
+        extract "tags/$release" "releases/$release"
+    else
+        echo "Skipping tag/release $tag"
+    fi
+done
