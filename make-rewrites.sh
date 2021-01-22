@@ -11,6 +11,13 @@ HTACCESS=_site/.htaccess
 
 echo "RewriteEngine on" > $HTACCESS
 
+if [[ "$AMWA_ID" == "SPECS" ]]; then
+    echo Copying top-level .htaccess
+    cp ../.htaccess $HTACCESS
+    exit 0
+fi
+
+
 if [[ -d branches ]]; then
     echo Making branch rewrite rules
     for b in branches/*; do

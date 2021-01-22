@@ -80,7 +80,7 @@ function extract {
         fi
 
         # These repos have docs in the main dir, not docs/
-        if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
+        if [[ "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
             for i in *.md; do
                 cp "$i" "../$target_dir"
             done

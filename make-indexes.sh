@@ -94,12 +94,14 @@ function do_tree {
                 cd "$dir" || exit 1
 
                 # These repos have unnumbered docs in the main dir
-                if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
+                if [[  "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
                     for doc in *.md; do
                         if [[ "$doc" != "index.md" &&
+                            "$doc" != "intro.md" &&
                             "$doc" != "README.md" &&
                             "$doc" != "CHANGELOG.md" &&
-                            "$doc" != "CONTRIBUTING.md" ]]; then
+                            "$doc" != "CONTRIBUTING.md" &&
+                            "$doc" != "404.md" ]]; then
                             add_unnumbered_doc "$doc"
                         fi
 
@@ -176,9 +178,10 @@ do_tree releases release
 
 echo "Making top level $INDEX"
 
-# Add lint and render status badges -- with GitHub Actions these default to default branch
-default_branch="$(git remote show origin | awk '/HEAD branch/ { print $3 }')"
-cat << EOF > "$INDEX"
+if [[ "$AMWA_ID" != "SPECS" ]]; then
+    # Add lint and render status badges -- with GitHub Actions these default to default branch
+    default_branch="$(git remote show origin | awk '/HEAD branch/ { print $3 }')"
+    cat << EOF > "$INDEX"
 | Repository | Default Branch | Lint (default) | Render (all) |
 | --- | --- | --- | --- |
 | [${REPO_ADDRESS##*/}]($REPO_ADDRESS) \
@@ -187,16 +190,17 @@ cat << EOF > "$INDEX"
 | [![Render Status]($REPO_ADDRESS/workflows/Render/badge.svg)]($REPO_ADDRESS/actions?query=workflow%3ARender) \
 |
 EOF
+fi
 
 # Repo-specific About: section...
-{ 
-    echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n"
+{
+    [[ "$AMWA_ID" != "SPECS" ]] && echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n"
     cat "$INTRO"
     echo -e "\n\n---\n\n"
 } >> "$INDEX"
 
 # Heading/intro depends on repo type
-if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-003" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
+if [[ "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-003" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
     echo "## Documentation" >> "$INDEX"
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     echo "## Parameter Registers" >> "$INDEX"
@@ -217,7 +221,7 @@ fi
 
 
 # These excluded repos don't have branch and releases indexes
-if [[ ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BCP-003" ]]; then
+if [[ ! "$AMWA_ID" == "SPECS" && ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BCP-003" ]]; then
     echo Adding branches index...
     INDEX_BRANCHES="branches/index.md"
     # Parameter Registers use branches for published and dev versions

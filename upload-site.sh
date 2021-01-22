@@ -41,6 +41,11 @@ do_ssh "mv $dest $dest.old ; mv $dest.new $dest; rm -rf $dest.old"
 echo Deleting tar file
 rm "$SITE_NAME.tar.gz"
 
+if [[ "$AMWA_ID" == "SPECS" ]]; then
+    echo Setting top level .htaccess and 404 page
+    do_ssh "mv $dest/.htaccess $dest/branches/main/404.html $dest/../"
+fi
+
 echo Deleting .ssh
 rm -rf .ssh
 
