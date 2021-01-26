@@ -80,8 +80,10 @@ function extract {
         fi
 
         # These repos have docs in the main dir, not docs/
-        if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
-            cp -- *.md "../$target_dir"
+        if [[ "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
+            for i in *.md; do
+                cp "$i" "../$target_dir"
+            done
             if [ -d images ] ; then
                 cp -r images "../$target_dir" 
             fi
@@ -151,7 +153,9 @@ EOF
                         [ -e "$i.bak" ] && mv "$i.bak" "$i" # Otherwise next checkout will fail
                     done
                     mkdir "../../$target_dir/APIs"
-                    mv -- *.html "../../$target_dir/APIs/"
+                    for i in *.html; do
+                        mv "$i" "../../$target_dir/APIs/"
+                    done
 
                     cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/"
 
@@ -203,7 +207,9 @@ EOF
                         done
                         echo "Moving examples..."
                         mkdir "../../$target_dir/examples"
-                        mv -- *.html "../../$target_dir/examples"
+                        for i in *.html; do
+                            mv "$i" "../../$target_dir/examples"
+                        done
                         cp ../../.scripts/json-formatter.js "../../$target_dir/examples"
                         cp -r ../../.scripts/codemirror "../../$target_dir/examples"
                 )
@@ -217,20 +223,16 @@ for branch in $(cd source-repo; git branch -r | sed 's:origin/::' | grep -v HEAD
     if [[ "$branch" =~ $SHOW_BRANCHES ]]; then
         extract "$branch" "branches/$branch"
     else
-        echo Skipping branch "$branch"
+        echo "Skipping branch $branch"
     fi
 done
 
-# Unfortunately NMOS-PARAMETER-REGISTERS already has a "tags" register, which has grabbed the /tags/ dir.
-# For now just skip in this case, but if we ever want to have releases of param-regs we'll need a better way...
-
-if [[ "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
-    mkdir tags
-    for tag in $(cd source-repo; git tag); do
-        if [[ "$tag" =~ $SHOW_TAGS ]]; then
-            extract "tags/$tag" "tags/$tag"
-        else
-            echo Skipping tag "$tag"
-        fi
-    done
-fi
+# tag means git tag, release means NMOS/GitHub release
+mkdir releases
+for tag in $(cd source-repo; git tag); do
+    if [[ "$tag" =~ $SHOW_RELEASES ]]; then
+        extract "tags/$tag" "releases/$tag"
+    else
+        echo "Skipping tag/release $tag"
+    fi
+done

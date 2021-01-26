@@ -24,7 +24,7 @@ set -o errexit
 shopt -s nullglob
 
 # Text in this file will appear at the start of the top-level index
-INTRO=intro.md
+README=../README.md
 INTRO_COMMON=.scripts/intro_common.md
 
 # Filename for index in each dir
@@ -80,13 +80,13 @@ function add_possibly_nested_example {
     echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
 };
 
-function do_b_or_t {
-    b_or_t=$1
-    label=$2
+function do_tree {
+    tree=$1
+    label=$2 # because of spelling of plurals
     
-    echo "Processing $b_or_t $INDEX..."
+    echo "Processing $tree $INDEX..."
     (
-        cd "$b_or_t" || exit 1
+        cd "$tree" || exit 1
         for dir in */; do
             dirname="${dir%%/}"
             echo "Making $dirname/$INDEX"
@@ -94,12 +94,13 @@ function do_b_or_t {
                 cd "$dir" || exit 1
 
                 # These repos have unnumbered docs in the main dir
-                if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
+                if [[  "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
                     for doc in *.md; do
                         if [[ "$doc" != "index.md" &&
                             "$doc" != "README.md" &&
                             "$doc" != "CHANGELOG.md" &&
-                            "$doc" != "CONTRIBUTING.md" ]]; then
+                            "$doc" != "CONTRIBUTING.md" &&
+                            "$doc" != "404.md" ]]; then
                             add_unnumbered_doc "$doc"
                         fi
 
@@ -171,18 +172,15 @@ function do_b_or_t {
     )
 }
 
-do_b_or_t branches branch
-
-# NMOS-PARAMETER-REGISTERS has NO GIT TAGS (see comment in extract-docs.sh)
-if [[ "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
-    do_b_or_t tags release/tag
-fi
+do_tree branches branch
+do_tree releases release
 
 echo "Making top level $INDEX"
 
-# Add lint and render status badges -- with GitHub Actions these default to default branch
-default_branch="$(git remote show origin | awk '/HEAD branch/ { print $3 }')"
-cat << EOF > "$INDEX"
+if [[ "$AMWA_ID" != "SPECS" ]]; then
+    # Add lint and render status badges -- with GitHub Actions these default to default branch
+    default_branch="$(git remote show origin | awk '/HEAD branch/ { print $3 }')"
+    cat << EOF > "$INDEX"
 | Repository | Default Branch | Lint (default) | Render (all) |
 | --- | --- | --- | --- |
 | [${REPO_ADDRESS##*/}]($REPO_ADDRESS) \
@@ -191,16 +189,17 @@ cat << EOF > "$INDEX"
 | [![Render Status]($REPO_ADDRESS/workflows/Render/badge.svg)]($REPO_ADDRESS/actions?query=workflow%3ARender) \
 |
 EOF
+fi
 
-# Repo-specific About: section...
-{ 
-    echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n"
-    cat "$INTRO"
+# Repo-specific intro taken from readme
+{
+    [[ "$AMWA_ID" != "SPECS" ]] && echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n"
+    ed -s "$README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
     echo -e "\n\n---\n\n"
 } >> "$INDEX"
 
 # Heading/intro depends on repo type
-if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-003" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
+if [[ "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-003" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
     echo "## Documentation" >> "$INDEX"
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     echo "## Parameter Registers" >> "$INDEX"
@@ -220,8 +219,8 @@ fi
 # TODO: DRY on the following...
 
 
-# These excluded repos don't have branch and tags indexes
-if [[ ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BCP-003" ]]; then
+# These excluded repos don't have branch and releases indexes
+if [[ ! "$AMWA_ID" == "SPECS" && ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BCP-003" ]]; then
     echo Adding branches index...
     INDEX_BRANCHES="branches/index.md"
     # Parameter Registers use branches for published and dev versions
@@ -239,15 +238,15 @@ if [[ ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BC
         echo -e "\n[$branch]($branch/)" >>  "$INDEX_BRANCHES"
     done
 
-    echo Adding tags index...
-    INDEX_TAGS="tags/index.md"
-    echo "## Published Releases/Tags" > "$INDEX_TAGS"
-    echo -e "\n##  Published Releases/Tags" >> "$INDEX"
-    for dir in tags/*; do
+    echo Adding releases index...
+    INDEX_RELEASES="releases/index.md"
+    echo "## Published Releases" > "$INDEX_RELEASES"
+    echo -e "\n##  Published Releases" >> "$INDEX"
+    for dir in releases/*; do
         [ ! -d "$dir" ] && continue
-        tag="${dir##*/}"
-        echo -e "\n[$tag](tags/$tag/)" >>  "$INDEX"
-        echo -e "\n[$tag]($tag/)" >>  "$INDEX_TAGS"
+        release="${dir##*/}"
+        echo -e "\n[$release](releases/$release/)" >>  "$INDEX"
+        echo -e "\n[$release]($release/)" >>  "$INDEX_RELEASES"
     done
 
 fi

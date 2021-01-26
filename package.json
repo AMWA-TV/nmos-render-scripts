@@ -8,6 +8,13 @@
   "dependencies": {
     "jsonlint": "^1.6.3",
     "raml2html": "^7.5.0",
-    "raml2html-nmos-theme": "file:./raml2html-nmos-theme"
+    "raml2html-nmos-theme": "file:./raml2html-nmos-theme",
+    "remark-cli": "^7.0.1",
+    "remark-preset-lint-recommended": "^3.0.3",
+    "remark-validate-links": "^10.0.0",
+    "yaml-lint": "^1.2.4"
+  },
+  "resolutions": {
+    "**/hosted-git-info": "3.0.4"
   }
 }
