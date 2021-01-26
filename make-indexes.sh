@@ -24,7 +24,7 @@ set -o errexit
 shopt -s nullglob
 
 # Text in this file will appear at the start of the top-level index
-INTRO=../intro.md
+README=../README.md
 INTRO_COMMON=.scripts/intro_common.md
 
 # Filename for index in each dir
@@ -97,7 +97,6 @@ function do_tree {
                 if [[  "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
                     for doc in *.md; do
                         if [[ "$doc" != "index.md" &&
-                            "$doc" != "intro.md" &&
                             "$doc" != "README.md" &&
                             "$doc" != "CHANGELOG.md" &&
                             "$doc" != "CONTRIBUTING.md" &&
@@ -192,10 +191,10 @@ if [[ "$AMWA_ID" != "SPECS" ]]; then
 EOF
 fi
 
-# Repo-specific About: section...
+# Repo-specific intro taken from readme
 {
     [[ "$AMWA_ID" != "SPECS" ]] && echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n"
-    cat "$INTRO"
+    ed -s "$README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
     echo -e "\n\n---\n\n"
 } >> "$INDEX"
 
