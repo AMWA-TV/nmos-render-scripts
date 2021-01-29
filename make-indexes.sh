@@ -94,7 +94,7 @@ function do_tree {
                 cd "$dir" || exit 1
 
                 # These repos have unnumbered docs in the main dir
-                if [[  "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
+                if [[  "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" ]]; then
                     for doc in *.md; do
                         if [[ "$doc" != "index.md" &&
                             "$doc" != "README.md" &&
@@ -203,7 +203,7 @@ fi
 } >> "$INDEX"
 
 # Heading/intro depends on repo type
-if [[ "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
+if [[ "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
     echo "## Documentation" >> "$INDEX"
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     echo "## Parameter Registers" >> "$INDEX"
