@@ -193,18 +193,20 @@ fi
 
 # Repo-specific intro taken from readme
 {
-    [[ "$AMWA_ID" != "SPECS" ]] && echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n"
+    if [[ "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
+        echo -e "\n\n---\n\n## About the ${AMWA_ID} Recommendations\n\n" 
+    elif [[ "$AMWA_ID" != "SPECS" ]]; then
+        echo -e "\n\n---\n\n## About ${AMWA_ID}\n\n"
+    fi
     ed -s "$README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
     echo -e "\n\n---\n\n"
 } >> "$INDEX"
 
 # Heading/intro depends on repo type
-if [[ "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-003" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
+if [[ "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
     echo "## Documentation" >> "$INDEX"
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     echo "## Parameter Registers" >> "$INDEX"
-elif [[ "$AMWA_ID" == "BCP-002" ]]; then
-    echo "## Best Current Practice document" >> "$INDEX"
 else
     # Common intro for specs
     sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g; s~%DEFAULT_TREE%~${DEFAULT_TREE}~g" "$INTRO_COMMON" >> "$INDEX"
