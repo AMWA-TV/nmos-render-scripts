@@ -93,21 +93,7 @@ function do_tree {
             (
                 cd "$dir" || exit 1
 
-                # These repos have unnumbered docs in the main dir
-                if [[  "$AMWA_ID" == "SPECS" ]]; then
-                    for doc in *.md; do
-                        if [[ "$doc" != "index.md" &&
-                            "$doc" != "README.md" &&
-                            "$doc" != "CHANGELOG.md" &&
-                            "$doc" != "CONTRIBUTING.md" &&
-                            "$doc" != "404.md" ]]; then
-                            add_unnumbered_doc "$doc"
-                        fi
-
-                    done
-
-                # NMOS-PARAMETER-REGISTERS has individual dir for each register
-                elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+                if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
                     for reg in common device-control-types device-types formats node-service-types tags transports; do
                         echo "- [$reg]($reg)" >> "$INDEX"
                     done
@@ -123,10 +109,16 @@ function do_tree {
 
                 # Other repos may have numbered docs/, APIs/, APIs/schemas/, examples/
                 else
+                    if [[ "$label" == "branch" && "$dirname" == "main" ]]; then
+                        # avoid "...for branch main" in repos where that might cause confusion
+                        tree_text=
+                    else
+                        tree_text="for $label $dirname"
+                    fi
                     if [ -d docs ]; then
                         INDEX_DOCS="docs/$INDEX"
-                        echo -e "\n## Documentation for $label $dirname\n" >> "$INDEX"
-                        echo -e "## Documentation for $label $dirname\n" >> "$INDEX_DOCS"
+                        echo -e "\n## Documentation $tree_text\n" >> "$INDEX"
+                        echo -e "## Documentation $tree_text\n" >> "$INDEX_DOCS"
                         for doc in docs/[1-9]*.md; do
                             add_numbered_doc "$doc"
                         done
@@ -134,8 +126,8 @@ function do_tree {
 
                     if [ -d APIs ]; then
                         INDEX_APIS="APIs/$INDEX"
-                        echo -e "\n## APIs for $label $dirname\n" >> "$INDEX"
-                        echo -e "## APIs for $label $dirname\n" > "$INDEX_APIS"
+                        echo -e "\n## APIs $tree_text\n" >> "$INDEX"
+                        echo -e "## APIs $tree_text\n" > "$INDEX_APIS"
                         for api in APIs/*.html; do
                             no_ext="${api%%.html}"
                             linktext="${no_ext##*/}"
@@ -146,8 +138,8 @@ function do_tree {
 
                     if [ -d APIs/schemas ]; then
                         INDEX_SCHEMAS="APIs/schemas/$INDEX"
-                        echo -e "\n### [JSON Schemas](APIs/schemas/)\n" >> "$INDEX"
-                        echo -e "## JSON Schemas for $label $dirname\n" > "$INDEX_SCHEMAS"
+                        echo -e "\n### [JSON Schemas](APIs/schemas/) $tree_text\n" >> "$INDEX"
+                        echo -e "## JSON Schemas $tree_text\n" > "$INDEX_SCHEMAS"
                         for schema in APIs/schemas/with-refs/*.html; do
                             no_ext="${schema%%.html}"
                             linktext="${no_ext##*/}"
@@ -157,8 +149,8 @@ function do_tree {
 
                     if [ -d examples ]; then
                         INDEX_EXAMPLES="examples/$INDEX"
-                        echo -e "\n### [Examples](examples/)\n" >> "$INDEX"
-                        echo -e "## Examples for $label $dirname\n" > "$INDEX_EXAMPLES"
+                        echo -e "\n### [Examples](examples/) $tree_text\n" >> "$INDEX"
+                        echo -e "## Examples $tree_text\n" > "$INDEX_EXAMPLES"
                         for example in examples/*.html; do
                             no_ext="${example%%.html}"
                             linktext="${no_ext##*/}"
@@ -203,7 +195,7 @@ fi
 } >> "$INDEX"
 
 # Heading/intro depends on repo type
-if [[ "$AMWA_ID" == "SPECS" || "$AMWA_ID" == "NMOS-TESTING" ]]; then
+if [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
     echo "## Documentation" >> "$INDEX"
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     echo "## Parameter Registers" >> "$INDEX"
