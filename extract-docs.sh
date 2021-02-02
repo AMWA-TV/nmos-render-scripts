@@ -63,23 +63,6 @@ function extract {
         cd source-repo || exit 1
         git checkout "$checkout"
 
-        # NMOS gets copies of some wiki docs
-        if [[ "$AMWA_ID" == "NMOS" ]]; then
-            git clone https://github.com/AMWA-TV/nmos.wiki
-
-            function get_wiki_doc {
-                echo "# $2" > "$1"
-                # Strip off table of contents comments
-                sed 's~^\[//\]:.*~~' "nmos.wiki/$1" >> "$1"
-            }
-            get_wiki_doc FAQ.md "NMOS FAQ"
-            get_wiki_doc Glossary.md "NMOS Glossary"
-            get_wiki_doc NMOS-Solutions.md "NMOS Solutions"
-
-            rm -rf nmos.wiki
-        fi
-
-        # NMOS-PARAMETER-REGISTERS has individual dir for each register
         if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
             cp -r common device-control-types device-types formats node-service-types tags transports "../$target_dir"
 
