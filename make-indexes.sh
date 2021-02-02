@@ -199,7 +199,7 @@ if [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
     echo "## Documentation" >> "$INDEX"
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     echo "## Parameter Registers" >> "$INDEX"
-else
+elif [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS" && "$AMWA_ID" != "BCP-002" && "$AMWA_ID" != "BCP-003" ]]; then
     # Common intro for specs
     sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g; s~%DEFAULT_TREE%~${DEFAULT_TREE}~g" "$INTRO_COMMON" >> "$INDEX"
 fi

@@ -42,14 +42,8 @@ function process_file {
     perl -pi -e 's:_\(c\) AMWA.*_$::' "$1"
 }
 
-# These repos have docs in the main dir, not docs/
-if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
-    for file in {branches,releases}/*/*.md index.md; do
-        process_file "$file"
-    done
-
 # NMOS-PARAMETER-REGISTERS has individual dir for each register
-elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     for file in {branches,releases}/*/*/*.md index.md; do
         process_file "$file"
     done
