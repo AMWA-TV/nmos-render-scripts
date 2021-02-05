@@ -1,4 +1,4 @@
-.PHONY: build source-repo docs indexes fix-links layouts site rewrites upload server clean
+.PHONY: build source-repo docs indexes fix-links layouts site rewrites upload server server-ext clean
 
 build: source-repo docs indexes fix-links layouts site rewrites
 
@@ -28,6 +28,9 @@ upload:
 
 server:
 	.scripts/run-server.sh
+
+server-ext:
+	.scripts/run-server.sh --host 0.0.0.0
 
 clean:
 	.scripts/make-clean.sh
