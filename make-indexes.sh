@@ -205,7 +205,7 @@ if [[ ! "$AMWA_ID" == "SPECS" && ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-
     INDEX_RELEASES="releases/index.md"
     echo "## Published Releases" > "$INDEX_RELEASES"
     echo -e "\n##  Published Releases" >> "$INDEX"
-    for release in $(ls -r1 releases/); do
+    for release in $(cd releases && echo -- * | awk '{ for (i=NF; i>=1; i--) print $i}'); do
         [ ! -d "releases/$release" ] && continue
         echo -e "\n[$release](releases/$release/)" >>  "$INDEX"
         echo -e "\n[$release]($release/)" >>  "$INDEX_RELEASES"
@@ -221,7 +221,7 @@ if [[ ! "$AMWA_ID" == "SPECS" && ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-
         echo "## Development Branches" > "$INDEX_BRANCHES"
         echo -e "\n## Development Branches" >> "$INDEX"
     fi
-    for branch in $(ls -r1 branches/); do
+    for branch in $(cd branches && echo -- * | awk '{ for (i=NF; i>=1; i--) print $i}'); do
         [ ! -d "branches/$branch" ] && continue
         echo -e "\n[$branch](branches/$branch/)" >>  "$INDEX"
         echo -e "\n[$branch]($branch/)" >>  "$INDEX_BRANCHES"
