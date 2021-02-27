@@ -25,7 +25,8 @@ echo "Fixing links in documents"
 
 function process_file {
     # Fix overview links
-    perl -pi -e 's~https://github.com/AMWA-TV/nmos/blob/master/NMOS%20Technical%20Overview.md~https://specs.amwa.tv/nmos/branches/master/NMOS_Technical_Overview.html~gi;' "$1" 
+    perl -pi -e 's~https://github.com/AMWA-TV/nmos/blob/master/NMOS%20Technical%20Overview.md~https://specs.amwa.tv/nmos/branches/main/NMOS_Technical_Overview.html~gi;' "$1" 
+
     # Change .raml links to .html
     perl -pi -e 's:\.raml\):.html\):g;' "$1"
 
@@ -38,25 +39,17 @@ function process_file {
     # Same but for reference links
     perl -ni -e '@parts = split /(\]:.*?\.md(?:#.*\b)?)/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
 
+    # Change .md links to .html
+    perl -pi -e 's:\.md\):.html\):g;' "$1"
+
     # Replace any copyright with blank line (because it is added in a footer)
     perl -pi -e 's:_\(c\) AMWA.*_$::' "$1"
 }
 
-# NMOS-PARAMETER-REGISTERS has individual dir for each register
-if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-    for file in {branches,releases}/*/*/*.md index.md; do
-        process_file "$file"
-    done
-
-# Other repos have some or all of docs/, APIs/, examples/
-else
-    for file in {branches,releases}/*/docs/*.md; do
-        process_file "$file"
-    done
-fi
-
-
-
+for file in index.md {branches,releases}/index.md {branches,releases}/*/index.md {branches,releases}/*/docs/*.md; do
+    echo "$file"
+    process_file "$file"
+done
 
 # Special case: relative links that need to go to the repo not the pages
 if [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
