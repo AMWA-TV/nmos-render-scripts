@@ -47,7 +47,6 @@ function process_file {
 }
 
 for file in index.md {branches,releases}/**/*.md; do
-    echo "$file"
     process_file "$file"
 done
 
