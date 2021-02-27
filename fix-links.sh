@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Copyright 2019 British Broadcasting Corporation
+# Copyright 2021 British Broadcasting Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 set -o errexit
 
-shopt -s nullglob
+shopt -s globstar nullglob
 
 # shellcheck source=get-config.sh
 . .scripts/get-config.sh
@@ -46,7 +46,7 @@ function process_file {
     perl -pi -e 's:_\(c\) AMWA.*_$::' "$1"
 }
 
-for file in index.md {branches,releases}/index.md {branches,releases}/*/index.md {branches,releases}/*/docs/*.md; do
+for file in index.md {branches,releases}/**/*.md; do
     echo "$file"
     process_file "$file"
 done
