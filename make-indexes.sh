@@ -193,7 +193,7 @@ fi
 # Add the default links at the top - correct the links while copying text
 if [ "$DEFAULT_TREE" ]; then
     echo "Adding in contents of $INDEX for default tree $DEFAULT_TREE"
-    sed "s:(:($DEFAULT_TREE/:" "$DEFAULT_TREE/$INDEX" >> "$INDEX"
+    sed "s:](:]($DEFAULT_TREE/:" "$DEFAULT_TREE/$INDEX" >> "$INDEX"
 fi
 
 # TODO: DRY on the following...
