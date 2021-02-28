@@ -63,6 +63,13 @@ function extract {
         cd source-repo || exit 1
         git checkout "$checkout"
 
+        # 404 doc for specs repo
+        if [[ "$AMWA_ID" == "SPECS" ]]; then
+            cp 404.md "../$target_dir"
+            cp .htaccess "../$target_dir"
+        fi
+
+        # Param regs still a special case
         if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
             cp -r common device-control-types device-types formats node-service-types tags transports "../$target_dir"
 
