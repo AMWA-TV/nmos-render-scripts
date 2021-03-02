@@ -24,13 +24,13 @@ tar -czf "$SITE_NAME.tar.gz" _site
 
 function do_ssh {
   # shellcheck disable=SC2029
-  ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" "$@"
+  ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" "$@" || exit 1
 }
 echo Making destination directory
 do_ssh "mkdir $dest.new"
 
 echo Uploading
-scp -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SITE_NAME.tar.gz" "$SSH_USER@$SSH_HOST:$dest.new/"
+scp -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SITE_NAME.tar.gz" "$SSH_USER@$SSH_HOST:$dest.new/" || exit 1
 
 echo Extracting
 do_ssh "cd $dest.new && tar --strip-components=1 -xf $SITE_NAME.tar.gz"
