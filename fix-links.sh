@@ -58,12 +58,15 @@ if [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
    }
 
     for tree in {branches,releases}/*; do
+        [[ ! -d "$tree" ]] && continue
+
         linkto="$REPO_ADDRESS/blob/${tree##*/}"
+        (
         cd "$tree"
             for file in docs/*.md; do
                 rewrite_link "../testssl/" "${linkto}/testssl/" "$file"
                 rewrite_link "../test_data/" "${linkto}/test_data/" "$file"
             done
-        cd ../..
+        )
     done
 fi
