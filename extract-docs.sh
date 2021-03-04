@@ -201,7 +201,7 @@ EOF
 
 mkdir branches
 for branch in $(cd source-repo; git branch -r | sed 's:origin/::' | grep -v HEAD | grep -v gh-pages); do
-    if [[ "$branch" =~ $SHOW_BRANCHES ]]; then
+    if [[ -n "$SHOW_BRANCHES" && "$branch" =~ $SHOW_BRANCHES ]]; then
         extract "$branch" "branches/$branch"
     else
         echo "Skipping branch $branch"
@@ -211,7 +211,7 @@ done
 # tag means git tag, release means NMOS/GitHub release
 mkdir releases
 for tag in $(cd source-repo; git tag); do
-    if [[ "$tag" =~ $SHOW_RELEASES ]]; then
+    if [[ -n "$SHOW_RELEASES" && "$tag" =~ $SHOW_RELEASES ]]; then
         extract "tags/$tag" "releases/$tag"
     else
         echo "Skipping tag/release $tag"
