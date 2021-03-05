@@ -213,14 +213,8 @@ if [[ ! "$AMWA_ID" == "SPECS" && ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-
 
     echo Adding branches index...
     INDEX_BRANCHES="branches/index.md"
-    # Parameter Registers use branches for published and dev versions
-    if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-        echo "## Branches" > "$INDEX_BRANCHES"
-        echo -e "\n## Branches" >> "$INDEX"
-    else
-        echo "## Development Branches" > "$INDEX_BRANCHES"
-        echo -e "\n## Development Branches" >> "$INDEX"
-    fi
+    echo "## Live Branches" > "$INDEX_BRANCHES"
+    echo -e "\n## Live Branches" >> "$INDEX"
     for branch in $(cd branches && echo -- * | awk '{ for (i=NF; i>=1; i--) print $i}'); do
         [ ! -d "branches/$branch" ] && continue
         echo -e "\n[$branch](branches/$branch/)" >>  "$INDEX"
