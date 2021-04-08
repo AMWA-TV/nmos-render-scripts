@@ -38,3 +38,5 @@ if [[ -d releases ]]; then
     done
 fi
 
+echo Making repo rewrite rule
+echo "RewriteRule ^repo/?$ $REPO_ADDRESS [R]" >> $HTACCESS
