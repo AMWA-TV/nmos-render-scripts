@@ -71,7 +71,7 @@ function extract {
 
         # Param regs still a special case
         if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-            cp -r common device-control-types device-types formats node-service-types tags transports "../$target_dir"
+            cp -r capabilities common device-control-types device-types flow-attributes formats node-service-types tags transports "../$target_dir"
 
         # Other repos have some or all of docs/, APIs/, examples/
         else
