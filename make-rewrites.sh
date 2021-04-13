@@ -39,4 +39,4 @@ if [[ -d releases ]]; then
 fi
 
 echo Making repo rewrite rule
-echo "RewriteRule ^repo/?$ $REPO_ADDRESS [R]" >> $HTACCESS
+echo "RewriteRule ^repo(.*) $REPO_ADDRESS\$1 [R]" >> $HTACCESS
