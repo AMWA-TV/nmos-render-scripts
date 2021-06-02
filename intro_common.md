@@ -1,4 +1,4 @@
-%AMWA_ID% has been developed by the [Advanced Media Workflow Association](https://www.amwa.tv) as part of the [Networked Media Open Specifications](https://www.nmos.tv) initiative.
+%AMWA_ID% has been developed by the [Advanced Media Workflow Association](https://www.amwa.tv) as part of the [Networked Media Open Specifications](https://www.amwa.tv/nmos-overview) initiative.
 See [here](https://specs.amwa.tv/nmos) for an overview of NMOS specifications.
 
 The [NMOS Testing Tool](https://specs.amwa.tv/nmos-testing) creates a simple web service for testing implementations of all NMOS APIs.
