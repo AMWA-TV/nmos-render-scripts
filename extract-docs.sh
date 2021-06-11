@@ -72,6 +72,12 @@ function extract {
         # Param regs still a special case
         if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
             cp -r capabilities common device-control-types device-types flow-attributes formats node-service-types tags transports "../$target_dir"
+            # Param reg JSONs that need rendering as HTML
+                for json in */*.json; do
+                    render-json.sh -n "$json" "$json" > "../$target_dir/${json%%.json}.html"
+                    cp ../.scripts/json-formatter.js "../$target_dir/${json%/*.json}/"
+                    cp -r ../.scripts/codemirror "../$target_dir/${json%/*.json}/"
+                done
 
         # Other repos have some or all of docs/, APIs/, examples/
         else

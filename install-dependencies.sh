@@ -17,5 +17,10 @@ if [[ -d ../APIs || -d ../examples ]]; then
     pip3 install jsonref pathlib
 fi
 
+# Param regs is a special case
+if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+    yarn add jsonlint
+fi
+
 # All specs need Jekyll
 bundle install
