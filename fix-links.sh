@@ -25,7 +25,7 @@ echo "Fixing links in documents"
 
 function process_file {
     # Fix overview links
-    perl -pi -e 's~https://github.com/AMWA-TV/nmos/blob/master/NMOS%20Technical%20Overview.md~https://specs.amwa.tv/nmos/branches/main/NMOS_Technical_Overview.html~gi;' "$1" 
+    perl -pi -e 's~https://github.com/AMWA-TV/nmos/blob/master/NMOS%20Technical%20Overview.md~https://specs.amwa.tv/nmos/branches/main/docs/2.0._Technical_Overview.html~gi;' "$1" 
 
     # Change .raml links to .html
     perl -pi -e 's:\.raml\):.html\):g;' "$1"
