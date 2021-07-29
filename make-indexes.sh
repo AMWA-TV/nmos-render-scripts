@@ -107,7 +107,7 @@ function do_tree {
                         done
                     fi
 
-                # Other repos may have numbered docs/, APIs/, APIs/schemas/, examples/
+                # Other repos may have unnumbered docs/, APIs/, APIs/schemas/, examples/
                 else
                     if [[ "$label" == "branch" && "$dirname" == "main" ]]; then
                         # avoid "...for branch main" in repos where that might cause confusion
@@ -119,8 +119,8 @@ function do_tree {
                         INDEX_DOCS="docs/$INDEX"
                         echo -e "\n## Documentation $tree_text\n" >> "$INDEX"
                         echo -e "## Documentation $tree_text\n" >> "$INDEX_DOCS"
-                        for doc in docs/[1-9]*.md; do
-                            add_numbered_doc "$doc"
+                        for doc in docs/*.md; do
+                            add_unnumbered_doc "$doc"
                         done
                     fi
 
