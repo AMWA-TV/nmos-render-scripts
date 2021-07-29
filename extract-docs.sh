@@ -79,30 +79,61 @@ function extract {
                     cp -r ../.scripts/codemirror "../$target_dir/${json%/*.json}/"
                 done
 
+
+
         # Other repos have some or all of docs/, APIs/, examples/
         else
             if [ -d docs ]; then
             (
                 cd docs || exit 1
-                mkdir "../../$target_dir/docs"
-                prev_file=
-                prev_link=
-                prevprev_link=
-                for i in [1-9]*.md; do
-                    cp "$i" "../../$target_dir/docs"
-                    this_file="../../$target_dir/docs/$i"
-                    this_link="${i// /%20}" # so links look like they do on github.com -- fixlinks.sh converts to underscore
-                    if [ -n "$prev_file" ]; then
-                        add_nav_links "$prevprev_link" "$this_link" "$prev_file" 
-                    fi
-                    prevprev_link="$prev_link"
-                    prev_file="$this_file"
-                    prev_link="$this_link"
-                done
-                add_nav_links "$prevprev_link" "" "$this_file" # Last one has no next; singleton has no previous either
 
-                if [ -d images ] ; then
-                    cp -r images "../../$target_dir/docs" 
+                if [ -f contents.md ]; then
+                    echo "Using contents.md for contents"
+                    mkdir "../../$target_dir/docs"
+                    prev_file=
+                    prev_link=
+                    prevprev_link=
+                    while read -r i; do
+                        cp "$i" "../../$target_dir/docs"
+                        this_file="../../$target_dir/docs/$i"
+                        this_link="${i// /%20}" # so links look like they do on github.com -- fixlinks.sh converts to underscore
+                        if [ -n "$prev_file" ]; then
+                            add_nav_links "$prevprev_link" "$this_link" "$prev_file" 
+                        fi
+                        prevprev_link="$prev_link"
+                        prev_file="$this_file"
+                        prev_link="$this_link"
+                    done <<< "$(awk  -F'^ *- ' '(NF>1){printf("%s.md\n", $2)}' contents.md)"
+                    add_nav_links "$prevprev_link" "" "$this_file" # Last one has no next; singleton has no previous either
+
+                   # Need to extract contents.md to make indexes later
+                   cp contents.md "../../$target_dir/docs" 
+
+                    if [ -d images ] ; then
+                        cp -r images "../../$target_dir/docs" 
+                    fi
+                else
+                    echo "No contents.md found so using document numbers"
+                    mkdir "../../$target_dir/docs"
+                    prev_file=
+                    prev_link=
+                    prevprev_link=
+                    for i in [1-9]*.md; do
+                        cp "$i" "../../$target_dir/docs"
+                        this_file="../../$target_dir/docs/$i"
+                        this_link="${i// /%20}" # so links look like they do on github.com -- fixlinks.sh converts to underscore
+                        if [ -n "$prev_file" ]; then
+                            add_nav_links "$prevprev_link" "$this_link" "$prev_file" 
+                        fi
+                        prevprev_link="$prev_link"
+                        prev_file="$this_file"
+                        prev_link="$this_link"
+                    done
+                    add_nav_links "$prevprev_link" "" "$this_file" # Last one has no next; singleton has no previous either
+
+                    if [ -d images ] ; then
+                        cp -r images "../../$target_dir/docs" 
+                    fi
                 fi
             )
             fi

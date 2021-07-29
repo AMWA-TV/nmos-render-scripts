@@ -24,7 +24,7 @@ set -o errexit
 shopt -s nullglob
 
 # Text in this file will appear at the start of the top-level index
-README=../README.md
+TOP_README=../README.md
 INTRO_COMMON=.scripts/intro_common.md
 
 # Filename for index in each dir
@@ -40,7 +40,26 @@ function add_unnumbered_doc {
     # [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
     [[ "$INDEX_DOCS" ]] && echo "- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
     echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
-};
+}
+
+function add_docs_from_markdown_list {
+    list=$1
+
+    if [[ ! -f "$list" ]]; then
+        echo "$list not found"
+        exit 1
+    fi
+
+    # Rename to use underscores instead of spaces
+    while read -r doc; do
+        mv "docs/$doc" "docs/${doc// /_}"
+    done <<< "$(awk  -F'^ *- ' '(NF>1){printf("%s.md\n", $2)}' $list)"
+
+    # Create a link with spaces in target converted to underscores
+    addstr=$(perl -p -e 's~(^ *- *)(.*)$~\1\[\2](docs/\2.md)~;  s~ (?=[^(]*.md)~_~g;' $list)
+    echo "$addstr" >> "$INDEX"
+    echo "$addstr" >> "$INDEX_DOCS"
+}
 
 function add_numbered_doc {
     doc=$1
@@ -78,7 +97,7 @@ function add_possibly_nested_example {
 
     [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
     echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
-};
+}
 
 function do_tree {
     tree=$1
@@ -107,7 +126,7 @@ function do_tree {
                         done
                     fi
 
-                # Other repos may have unnumbered docs/, APIs/, APIs/schemas/, examples/
+                # Other repos may have (possibly numbered) docs/, APIs/, APIs/schemas/, examples/
                 else
                     if [[ "$label" == "branch" && "$dirname" == "main" ]]; then
                         # avoid "...for branch main" in repos where that might cause confusion
@@ -118,10 +137,16 @@ function do_tree {
                     if [ -d docs ]; then
                         INDEX_DOCS="docs/$INDEX"
                         echo -e "\n## Documentation $tree_text\n" >> "$INDEX"
-                        echo -e "## Documentation $tree_text\n" >> "$INDEX_DOCS"
-                        for doc in docs/*.md; do
-                            add_unnumbered_doc "$doc"
-                        done
+                        echo -e "## Documentation $tree_text\n" > "$INDEX_DOCS"
+                        if [ -f docs/contents.md ] ; then
+                            echo Adding docs/contents.md
+                            add_docs_from_markdown_list docs/contents.md
+                        else
+                            echo "No contents.md so using numbers"
+                            for doc in docs/*.md; do
+                                add_numbered_doc "$doc"
+                            done
+                        fi
                     fi
 
                     if [ -d APIs ]; then
@@ -176,7 +201,7 @@ echo "Making top level $INDEX"
     elif [[ "$AMWA_ID" != "SPECS" ]]; then
         echo -e "\n\n## About ${AMWA_ID}\n\n"
     fi
-    ed -s "$README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
+    ed -s "$TOP_README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
     echo -e "\n\n---\n\n"
 } > "$INDEX"
 
