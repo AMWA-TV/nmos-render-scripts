@@ -52,7 +52,8 @@ function add_docs_from_markdown_list {
 
     # Rename to use underscores instead of spaces
     while read -r doc; do
-        mv "docs/$doc" "docs/${doc// /_}"
+        underscore_space_doc="${doc// /_}"
+        [[ "$underscore_space_doc" != "$doc" ]] && mv "$doc" "$underscore_space_doc"
     done <<< "$(awk  -F'^ *- ' '(NF>1){printf("%s.md\n", $2)}' $list)"
 
     # Create a link with spaces in target converted to underscores
