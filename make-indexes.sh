@@ -42,24 +42,27 @@ function add_unnumbered_doc {
     echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
 }
 
-function add_docs_from_markdown_list {
+
+function add_docs_from_markdown_list_of_links {
     list=$1
 
     if [[ ! -f "$list" ]]; then
         echo "$list not found"
         exit 1
-    fi
+    fi    
 
-    # Rename to use underscores instead of spaces
-    while read -r doc; do
-        underscore_space_doc="${doc// /_}"
-        [[ "$underscore_space_doc" != "$doc" ]] && mv "docs/$doc" "docs/$underscore_space_doc"
-    done <<< "$(awk  -F'^ *- ' '(NF>1){printf("%s.md\n", $2)}' $list)"
+    # Rename to use underscores instead of escaped (%20) spaces 
+    while read -r doc; do 
 
-    # Create a link with spaces in target converted to underscores
-    addstr=$(perl -p -e 's~(^ *- *)(.*)$~\1\[\2](docs/\2.md)~;  s~ (?=[^(]*.md)~_~g;' $list)
-    echo "$addstr" >> "$INDEX"
-    echo "$addstr" >> "$INDEX_DOCS"
+        space_doc="${doc//%20/ }.md"
+        underscore_doc="${doc//%20/_}.md"
+        [[ "$underscore_doc" != "$space_doc" ]] && mv "docs/$space_doc" "docs/$underscore_doc"
+
+    done <<< "$(awk -F'^ *- \\[.*\\]\\(' '(NF>1){print $2}' $list | sed 's/\.md)//')"
+
+    # append index links with docs/
+    perl -p -e 's~\]\(~\]\(docs/~' "$list" >> "$INDEX"
+    perl -p -e 's~\]\(~\]\(docs/~' "$list" >> "$INDEX_DOCS"
 }
 
 function add_numbered_doc {
@@ -139,7 +142,10 @@ function do_tree {
                         INDEX_DOCS="docs/$INDEX"
                         echo -e "\n## Documentation $tree_text\n" >> "$INDEX"
                         echo -e "## Documentation $tree_text\n" > "$INDEX_DOCS"
-                        if [ -f docs/contents.md ] ; then
+                        if [ -f docs/README.md ] ; then
+                            echo Adding docs/README.md
+                            add_docs_from_markdown_list_of_links docs/README.md
+                        elif [ -f docs/contents.md ] ; then
                             echo Adding docs/contents.md
                             add_docs_from_markdown_list docs/contents.md
                         else

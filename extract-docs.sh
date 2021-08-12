@@ -87,7 +87,36 @@ function extract {
             (
                 cd docs || exit 1
 
-                if [ -f contents.md ]; then
+                if [ -f README.md ]; then
+                    echo "Using README.md for contents"
+                    mkdir "../../$target_dir/docs"
+                    prev_file=
+                    prev_link=
+                    prevprev_link=
+                    while read -r i; do
+                        filename="${i//%20/ }.md" # README.md links use %20 for spaces
+                        cp "$filename" "../../$target_dir/docs"
+                        this_file="../../$target_dir/docs/$filename"
+                        this_link="${filename// /%20}" # so links look like they do on github.com -- fixlinks.sh converts to underscore
+                        if [ -n "$prev_file" ]; then
+                            add_nav_links "$prevprev_link" "$this_link" "$prev_file" 
+                        fi
+                        prevprev_link="$prev_link"
+                        prev_file="$this_file"
+                        prev_link="$this_link"
+                    done <<< "$(awk -F'^ *- \\[.*\\]\\(' '(NF>1){print $2}' README.md | sed 's/.md)//')"
+                    add_nav_links "$prevprev_link" "" "$this_file" # Last one has no next; singleton has no previous either
+
+                   # Need to extract contents.md to make indexes later
+                   cp README.md "../../$target_dir/docs" 
+
+                    if [ -d images ] ; then
+                        cp -r images "../../$target_dir/docs" 
+                    fi               
+
+                elif [ -f contents.md ]; then
+                    echo "==== THIS CODE IS NOT IN USE ==="
+                    exit 1
                     echo "Using contents.md for contents"
                     mkdir "../../$target_dir/docs"
                     prev_file=
