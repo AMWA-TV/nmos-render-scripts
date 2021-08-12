@@ -24,7 +24,7 @@ set -o errexit
 shopt -s nullglob
 
 # Text in this file will appear at the start of the top-level index
-README=../README.md
+TOP_README=../README.md
 INTRO_COMMON=.scripts/intro_common.md
 
 # Filename for index in each dir
@@ -40,7 +40,30 @@ function add_unnumbered_doc {
     # [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
     [[ "$INDEX_DOCS" ]] && echo "- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
     echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
-};
+}
+
+
+function add_docs_from_markdown_list_of_links {
+    list=$1
+
+    if [[ ! -f "$list" ]]; then
+        echo "$list not found"
+        exit 1
+    fi    
+
+    # Rename to use underscores instead of escaped (%20) spaces 
+    while read -r doc; do 
+
+        space_doc="${doc//%20/ }.md"
+        underscore_doc="${doc//%20/_}.md"
+        [[ "$underscore_doc" != "$space_doc" ]] && mv "docs/$space_doc" "docs/$underscore_doc"
+
+    done <<< "$(awk -F'^ *- \\[.*\\]\\(' '(NF>1){print $2}' $list | sed 's/\.md)//')"
+
+    # append index links with docs/
+    perl -p -e 's~\]\(~\]\(docs/~' "$list" >> "$INDEX"
+    perl -p -e 's~\]\(~\]\(docs/~' "$list" >> "$INDEX_DOCS"
+}
 
 function add_numbered_doc {
     doc=$1
@@ -78,7 +101,7 @@ function add_possibly_nested_example {
 
     [[ "$INDEX_DOCS" ]] && echo "${indent}- [$linktext](${underscore_space_doc##*/})" >> "$INDEX_DOCS"
     echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
-};
+}
 
 function do_tree {
     tree=$1
@@ -107,7 +130,7 @@ function do_tree {
                         done
                     fi
 
-                # Other repos may have numbered docs/, APIs/, APIs/schemas/, examples/
+                # Other repos may have (possibly numbered) docs/, APIs/, APIs/schemas/, examples/
                 else
                     if [[ "$label" == "branch" && "$dirname" == "main" ]]; then
                         # avoid "...for branch main" in repos where that might cause confusion
@@ -118,10 +141,21 @@ function do_tree {
                     if [ -d docs ]; then
                         INDEX_DOCS="docs/$INDEX"
                         echo -e "\n## Documentation $tree_text\n" >> "$INDEX"
-                        echo -e "## Documentation $tree_text\n" >> "$INDEX_DOCS"
-                        for doc in docs/[1-9]*.md; do
-                            add_numbered_doc "$doc"
-                        done
+                        echo -e "## Documentation $tree_text\n" > "$INDEX_DOCS"
+
+
+                        if compgen -G "docs/[1-9].*.md" > /dev/null ; then
+                            echo "Adding numbered docs"
+                            for doc in docs/*.md; do
+                                add_numbered_doc "$doc"
+                            done
+                        elif [ -f docs/README.md ] ; then
+                            echo Adding docs from list in README.md
+                            add_docs_from_markdown_list_of_links docs/README.md
+                        else
+                            echo No numbered docs or README.md found
+                            exit 1
+                        fi
                     fi
 
                     if [ -d APIs ]; then
@@ -176,7 +210,7 @@ echo "Making top level $INDEX"
     elif [[ "$AMWA_ID" != "SPECS" ]]; then
         echo -e "\n\n## About ${AMWA_ID}\n\n"
     fi
-    ed -s "$README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
+    ed -s "$TOP_README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
     echo -e "\n\n---\n\n"
 } > "$INDEX"
 
@@ -201,7 +235,7 @@ fi
 
 # These excluded repos don't have branch and releases indexes
 if [[ ! "$AMWA_ID" == "SPECS" && ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-002" && ! "$AMWA_ID" == "BCP-003" ]]; then
-    echo Adding releases index...
+    echo Adding releases index
     INDEX_RELEASES="releases/index.md"
     echo "## Published Releases" > "$INDEX_RELEASES"
     echo -e "\n##  Published Releases" >> "$INDEX"
@@ -211,7 +245,7 @@ if [[ ! "$AMWA_ID" == "SPECS" && ! "$AMWA_ID" == "NMOS" && ! "$AMWA_ID" == "BCP-
         echo -e "\n[$release]($release/)" >>  "$INDEX_RELEASES"
     done
 
-    echo Adding branches index...
+    echo Adding branches index
     INDEX_BRANCHES="branches/index.md"
     echo "## Live Branches" > "$INDEX_BRANCHES"
     echo -e "\n## Live Branches" >> "$INDEX"
