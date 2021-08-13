@@ -58,7 +58,7 @@ function add_docs_from_markdown_list_of_links {
         underscore_doc="${doc//%20/_}.md"
         [[ "$underscore_doc" != "$space_doc" ]] && mv "docs/$space_doc" "docs/$underscore_doc"
 
-    done <<< "$(awk -F'^ *- \\[.*\\]\\(' '(NF>1){print $2}' $list | sed 's/\.md)//')"
+    done <<< "$(awk -F'^ *- \\[.*\\]\\(' '(NF>1){print $2}' "$list" | sed 's/\.md)//')"
 
     # append index links with docs/
     perl -p -e 's~\]\(~\]\(docs/~' "$list" >> "$INDEX"
