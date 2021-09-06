@@ -6,7 +6,12 @@
 # It now pulls in settings from _config.yml
 # TODO: just read _config.yml once!
 
-_CONFIG_YML=_config.yml
+if [[ "$CONFIG" ]]; then
+    echo "Warning: Using config from $CONFIG rather than _config.yml"
+    _CONFIG_YML="$CONFIG"
+else
+    _CONFIG_YML=_config.yml
+fi
 
 if [ ! -f $_CONFIG_YML ]; then
     echo Cannot find $_CONFIG_YML >&2 
@@ -15,12 +20,18 @@ else
     echo Getting config from $_CONFIG_YML
 fi
 
-AMWA_ID="$(awk '/amwa_id/ { print $2 }' $_CONFIG_YML)"
-REPO_ORIGIN="$(git remote get-url origin)"
-REPO_ADDRESS="${REPO_ORIGIN%.git}"
+if [[ "$EXTRACT_FROM" ]]; then
+    echo "Warning: Extracting from $EXTRACT_FROM rather than origin"
+    REPO_ADDRESS="$EXTRACT_FROM"
+else
+    REPO_ORIGIN="$(git remote get-url origin)"
+    REPO_ADDRESS="${REPO_ORIGIN%.git}"
+fi
+
 REPO_NAME="${REPO_ADDRESS##*/}"
-BASEURL="$(awk '/baseurl/ { print $2 }' $_CONFIG_YML)"
+BASEURL="$(awk '/baseurl:/ { print $2 }' $_CONFIG_YML)"
 SITE_NAME="${BASEURL#/}"
+AMWA_ID="$(awk '/amwa_id:/ { print $2 }' $_CONFIG_YML)"
 DEFAULT_TREE="$(awk '/default_tree:/ { print $2 }' $_CONFIG_YML)"
 SHOW_RELEASES="$(awk '/show_releases:/ { print $2 }' $_CONFIG_YML)"
 SHOW_BRANCHES="$(awk '/show_branches:/ { print $2 }' $_CONFIG_YML)"
