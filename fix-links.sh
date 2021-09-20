@@ -44,6 +44,9 @@ function process_file {
 
     # Replace any copyright with blank line (because it is added in a footer)
     perl -pi -e 's:_\(c\) AMWA.*_$::' "$1"
+
+    # Workaround for https://github.com/rouge-ruby/rouge/issues/1704
+    perl -pi -e 's:^```http:```:' "$1"
 }
 
 for file in index.md {branches,releases}/**/*.md; do
