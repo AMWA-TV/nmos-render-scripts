@@ -6,4 +6,5 @@
 
 This repo holds scripts used to extract and render documentation, RAML and JSON for NMOS specification repos.
 
-It will replace the scripts in the gh-pages branch of these repos.
+See https://github.com/AMWA-TV/nmos-template for an example of its typical use:
+it is cloned into `.render/.scripts` when making the installing the render tools (`make -C .render build-tools`) and its scripts run using `make -C .render`.
