@@ -21,10 +21,10 @@ PATH=$PWD/.scripts:$PWD/node_modules/.bin:$PATH
 
 . get-config.sh
 
-if [[ "$AMWA_ID" =~ "IS-" && ! -d /user/bin ]]; then
-    echo "fatal: Cannot find build tools (have you done 'make build-tools?')"
-    exit 1
-fi
+# if [[ "$AMWA_ID" =~ "IS-" && ! -d /user/bin ]]; then
+#    echo "fatal: Cannot find build tools (have you done 'make build-tools?')"
+#    exit 1
+# fi
 
 # Unfortunately bash doesn't have proper functions or scoping
 function make_label {
