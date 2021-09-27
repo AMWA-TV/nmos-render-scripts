@@ -21,7 +21,7 @@ PATH=$PWD/.scripts:$PWD/node_modules/.bin:$PATH
 
 . get-config.sh
 
-if [[ "$AMWA_ID" =~ "IS-" && ! -d node_modules/.bin ]]; then
+if [[ "$AMWA_ID" =~ "IS-" && ! -d /user/bin ]]; then
     echo "fatal: Cannot find build tools (have you done 'make build-tools?')"
     exit 1
 fi
@@ -29,7 +29,7 @@ fi
 # Unfortunately bash doesn't have proper functions or scoping
 function make_label {
     local label="${1%%.md}"
-    label="${label//%20/ }"                   
+    label="${label//%20/ }"
     label="${label/#*([0-9.]) /}"
     # label="${label/#* - /}"
     echo "$label"
@@ -100,7 +100,7 @@ function extract {
                         this_file="../../$target_dir/docs/$i"
                         this_link="${i// /%20}" # so links look like they do on github.com -- fixlinks.sh converts to underscore
                         if [ -n "$prev_file" ]; then
-                            add_nav_links "$prevprev_link" "$this_link" "$prev_file" 
+                            add_nav_links "$prevprev_link" "$this_link" "$prev_file"
                         fi
                         prevprev_link="$prev_link"
                         prev_file="$this_file"
@@ -117,7 +117,7 @@ function extract {
                         this_file="../../$target_dir/docs/$filename"
                         this_link="${filename// /%20}" # so links look like they do on github.com -- fixlinks.sh converts to underscore
                         if [ -n "$prev_file" ]; then
-                            add_nav_links "$prevprev_link" "$this_link" "$prev_file" 
+                            add_nav_links "$prevprev_link" "$this_link" "$prev_file"
                         fi
                         prevprev_link="$prev_link"
                         prev_file="$this_file"
@@ -134,7 +134,7 @@ function extract {
                 fi
 
                 if [ -d images ] ; then
-                    cp -r images "../../$target_dir/docs" 
+                    cp -r images "../../$target_dir/docs"
                 fi
 
             )
@@ -207,7 +207,7 @@ EOF
                     echo "Tidying"
                     # Restore things how they were to ensure next checkout doesn't overwrite
                     for i in schemas/with-refs/*.json; do
-                        mv "$i" schemas/ 
+                        mv "$i" schemas/
                     done
                     rm -rf schemas/with-refs schemas/resolved
                 fi
@@ -219,7 +219,7 @@ EOF
                 cd examples || exit 1
                     for i in **/*.json; do
                         flat=${i//*\//}
-                        HTML_EXAMPLE=${flat%%.json}.html 
+                        HTML_EXAMPLE=${flat%%.json}.html
                         render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
                     done
                     echo "Moving examples"
