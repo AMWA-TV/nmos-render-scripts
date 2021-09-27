@@ -17,7 +17,7 @@
 set -o errexit
 shopt -s extglob globstar nullglob
 
-PATH=$PWD/.scripts:/usr/bin:$PATH
+PATH=$PWD/.scripts:/usr/src/node_modules:$PATH
 
 . get-config.sh
 
