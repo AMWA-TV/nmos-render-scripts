@@ -49,10 +49,10 @@ function add_docs_from_markdown_list_of_links {
     if [[ ! -f "$list" ]]; then
         echo "$list not found"
         exit 1
-    fi    
+    fi
 
-    # Rename to use underscores instead of escaped (%20) spaces 
-    while read -r doc; do 
+    # Rename to use underscores instead of escaped (%20) spaces
+    while read -r doc; do
 
         space_doc="${doc//%20/ }.md"
         underscore_doc="${doc//%20/_}.md"
@@ -106,7 +106,7 @@ function add_possibly_nested_example {
 function do_tree {
     tree=$1
     label=$2 # because of spelling of plurals
-    
+
     echo "Processing $tree $INDEX..."
     (
         cd "$tree" || exit 1
@@ -206,11 +206,11 @@ echo "Making top level $INDEX"
 # Repo-specific intro taken from readme
 {
     if [[ "$AMWA_ID" == "BCP-002" || "$AMWA_ID" == "BCP-003" ]]; then
-        echo -e "\n\n## About the ${AMWA_ID} Recommendations\n\n" 
+        echo -e "\n\n## About the ${AMWA_ID} Recommendations\n\n"
     elif [[ "$AMWA_ID" != "SPECS" ]]; then
         echo -e "\n\n## About ${AMWA_ID}\n\n"
     fi
-    ed -s "$TOP_README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
+    ed "$TOP_README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
     echo -e "\n\n---\n\n"
 } > "$INDEX"
 
