@@ -210,7 +210,7 @@ echo "Making top level $INDEX"
     elif [[ "$AMWA_ID" != "SPECS" ]]; then
         echo -e "\n\n## About ${AMWA_ID}\n\n"
     fi
-    ed -s "$TOP_README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
+    ed "$TOP_README" <<< '/INTRO-START/+1,/INTRO-END/-1p'
     echo -e "\n\n---\n\n"
 } > "$INDEX"
 
