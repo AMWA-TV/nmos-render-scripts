@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-docker build -t amwa/nmos-testing ..
+docker build -t amwa/nmos-render ..
