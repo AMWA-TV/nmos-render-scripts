@@ -2,11 +2,13 @@
 
 shopt -s globstar nullglob
 
-echo Removing source_repo
-rm -rf source_repo/
+echo Removing source-repo
+rm -rf source-repo
 
 echo Renaming files to prevent zero-length issue
-find branches releases -type f \( -name '*.png' -o -name '*.js' -o -name '*.css' \) -exec mv {} {}.notzero \;
+for i in {branches,releases}/**/*.{png,js,css}; do
+	mv "$i" "$i.notzero"
+done
 
 echo Building site
 bundle exec jekyll build
