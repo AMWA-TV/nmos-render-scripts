@@ -32,12 +32,8 @@ do_ssh "mkdir $dest.new"
 echo Uploading
 scp -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SITE_NAME.tar.gz" "$SSH_USER@$SSH_HOST:$dest.new/" || exit 1
 
-do_ssh "ls -lR $dest.new" # TEST
-
 echo Extracting
 do_ssh "cd $dest.new && tar --strip-components=1 -xf $SITE_NAME.tar.gz"
-
-do_ssh "ls -lR $dest.new" # TEST
 
 echo Replacing old site
 do_ssh "mv $dest $dest.old ; mv $dest.new $dest; rm -rf $dest.old"

@@ -4,25 +4,28 @@
 FROM jekyll/jekyll
 
 RUN apk update
+
+# Common commands needed by the render scripts
 RUN apk add --no-cache --update \
     git \
     perl \
     ed \
     openssh
 
+# Python modules 
 RUN pip3 install --upgrade pip && pip3 install \
     setuptools \
     jsonref \
     pathlib
 
-# Copies your code file from your action repository to the filesystem path `/` of the container
-COPY entrypoint.sh /entrypoint.sh
-
+# Needed for GitHub Pages plugin
 COPY Gemfile /Gemfile
 RUN bundle install
 
-#RUN mkdir /usr/src/node_modules && cd /usr/src/node_modules && npm install -g raml2html
-RUN git clone https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/raml2html-nmos-theme /raml2html-nmos-theme
+# NMOS has its own RAML2HTML theme
+RUN git clone --depth 1 https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/raml2html-nmos-theme /raml2html-nmos-theme
+
+# Node modules
 RUN yarn global add \
     jsonlint \
     raml2html \
@@ -32,5 +35,14 @@ RUN yarn global add \
     yaml-lint \
     file:/raml2html-nmos-theme
 
-# Code file to execute when the docker container starts up (`entrypoint.sh`)
+# Copy the render scripts etc.
+COPY *.sh *.py \
+    json-formatter.js \
+    scripts.mk \
+    intro_common.md \
+    /.scripts/
+COPY codemirror /.scripts/codemirror/
+
+# /entrypoint.sh is executed by default when the container runs
+COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
