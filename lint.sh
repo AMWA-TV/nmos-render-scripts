@@ -2,13 +2,13 @@
 
 shopt -s globstar nullglob
 
-echo Linting Markdown...
+echo Linting Markdown
 if ! find . -name node_modules -prune -o -name '*.md' -print0 | xargs -0 ./node_modules/.bin/remark --rc-path .scripts/.remarkrc --frail; then
     failed=y
 fi
 
 if [ -d APIs ]; then
-    echo Linting APIs...
+    echo Linting APIs
     for i in APIs/*.raml; do
         perl -pi.bak -e 's/!include//' "$i"
         if ./node_modules/.bin/yamllint "$i" > output; then
@@ -24,7 +24,7 @@ if [ -d APIs ]; then
 fi
 
 if [ -d APIs/schemas ]; then
-    echo Linting schemas...
+    echo Linting schemas
     for i in APIs/schemas/*.json ; do
         if ./node_modules/.bin/jsonlint "$i" > /dev/null; then
             echo "$i" ok
@@ -36,7 +36,7 @@ if [ -d APIs/schemas ]; then
 fi
 
 if [ -d examples ]; then
-    echo Linting examples...
+    echo Linting examples
     for i in examples/**/*.json ; do
         if ./node_modules/.bin/jsonlint "$i" > /dev/null; then
             echo "$i" ok

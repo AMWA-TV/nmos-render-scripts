@@ -107,7 +107,7 @@ function do_tree {
     tree=$1
     label=$2 # because of spelling of plurals
 
-    echo "Processing $tree $INDEX..."
+    echo "Processing $tree $INDEX"
     (
         cd "$tree" || exit 1
         for dir in */; do
