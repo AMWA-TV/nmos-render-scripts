@@ -20,9 +20,7 @@ echo "$SSH_PRIVATE_KEY" > .ssh/id_rsa && chmod 600 .ssh/id_rsa
 echo "$SSH_KNOWN_HOSTS" > .ssh/known_hosts && chmod 600 .ssh/known_hosts
 
 echo Making tar
-ls -lR _site # TEST
 tar -czf "$SITE_NAME.tar.gz" _site
-ls -l "$SITE_NAME.tar.gz" # TEST
 
 function do_ssh {
   # shellcheck disable=SC2029

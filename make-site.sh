@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+echo Zero length files before making site...
+find . -size 0 -print
+
 echo Removing source_repo...
 rm -rf source_repo 
 
@@ -8,3 +11,6 @@ bundle exec jekyll build
 
 echo Removing Markdown...
 find _site -name '*.md' -exec rm {} \;
+
+echo Zero length files after making site...
+find . -size 0 -print
