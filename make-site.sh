@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+shopt -s globstar nullglob
+
 echo Removing source_repo...
 rm -rf source_repo/
 
@@ -13,9 +15,9 @@ echo Removing Markdown...
 find _site -name '*.md' -exec rm {} \;
 
 echo Renaming files back...
-for i in $(find _site -name '*.notzero'); do
+for i in _site/**/*.notzero; do
 	mv "$i" "${i%%.notzero}"
 done
 
 echo Checking for zero length files...
-find . -size 0 -print
+find _site -size 0 -print
