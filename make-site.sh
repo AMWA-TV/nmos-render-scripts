@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -o errexit
 shopt -s globstar nullglob
 
 echo Removing source-repo
