@@ -46,3 +46,5 @@ COPY codemirror /.scripts/codemirror/
 # /entrypoint.sh is executed by default when the container runs
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
+
+COPY multi-repo.sh /multi-repo.sh
