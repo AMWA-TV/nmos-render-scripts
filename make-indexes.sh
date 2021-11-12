@@ -117,7 +117,7 @@ function do_tree {
                 cd "$dir" || exit 1
 
                 if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-                    for reg in capabilities common device-control-types device-types flow-attributes formats node-service-types tags transports; do
+                    for reg in capabilities common device-control-types device-types flow-attributes formats node-service-types tags transports transport-parameters; do
                         echo "- [$reg]($reg)" >> "$INDEX"
                     done
 
