@@ -117,7 +117,6 @@ window.editor_json = CodeMirror.fromTextArea(mytextarea, {
       }
     }
   );
-editor_json.
 editor_json.foldCode(CodeMirror.Pos(3, 0));
 </script>
 EOF
