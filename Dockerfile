@@ -10,7 +10,8 @@ RUN apk add --no-cache --update \
     git \
     perl \
     ed \
-    openssh
+    openssh \
+    jq
 
 # Python modules 
 RUN pip3 install --upgrade pip && pip3 install \
@@ -33,6 +34,7 @@ RUN yarn global add \
     remark-preset-lint-recommended \
     remark-validate-links \
     yaml-lint \
+    yamljs \
     file:/raml2html-nmos-theme
 
 # Copy the render scripts etc.
