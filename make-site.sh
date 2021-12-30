@@ -3,6 +3,9 @@
 set -o errexit
 shopt -s globstar nullglob
 
+# shellcheck source=get-config.sh
+. .scripts/get-config.sh
+
 echo Removing source-repo
 rm -rf source-repo
 
@@ -21,6 +24,11 @@ echo Renaming files back
 for i in _site/**/*.notzero; do
 	mv "$i" "${i%%.notzero}"
 done
+
+if [[ "$AMWA_ID" == "NMOS" ]]; then
+    echo Making specs.json
+    .scripts/make-specs-json.sh
+fi
 
 echo Checking for zero length files
 find _site -size 0 -print
