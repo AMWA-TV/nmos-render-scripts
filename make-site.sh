@@ -10,7 +10,7 @@ echo Removing source-repo
 rm -rf source-repo
 
 if [[ "$AMWA_ID" == "NMOS" ]]; then
-    echo Making specs.json
+    echo Making _data/specs.json
     .scripts/make-specs-json.sh
 fi
 

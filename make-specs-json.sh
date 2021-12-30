@@ -3,6 +3,7 @@
 set -o errexit
 
 CONCAT=/tmp/concat.json
+rm -f "$CONCAT"
 
 echo "Getting spec info: "
 for id in $(yaml2json _data/spec_list.yml | jq -r '.[]'); do
@@ -11,4 +12,4 @@ for id in $(yaml2json _data/spec_list.yml | jq -r '.[]'); do
 done
 echo
 
-jq --slurp . "$CONCAT" > specs.json
+jq --slurp . "$CONCAT" > _data/specs.json
