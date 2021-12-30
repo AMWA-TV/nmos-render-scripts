@@ -7,7 +7,7 @@ CONCAT=/tmp/concat.json
 echo "Getting spec info: "
 for id in $(yaml2json _data/spec_list.yml | jq -r '.[]'); do
 	echo -n "$id "
-	curl -s "https://specs.amwa.tv/${id,,}/spec.json" >> "$CONCAT"
+	wget -O- -q "https://specs.amwa.tv/${id,,}/spec.json" >> "$CONCAT"
 done
 echo
 
