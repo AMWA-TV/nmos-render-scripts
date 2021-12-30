@@ -9,6 +9,11 @@ shopt -s globstar nullglob
 echo Removing source-repo
 rm -rf source-repo
 
+if [[ "$AMWA_ID" == "NMOS" ]]; then
+    echo Making specs.json
+    .scripts/make-specs-json.sh
+fi
+
 echo Renaming files to prevent zero-length issue
 for i in {branches,releases}/**/*.{png,js,css}; do
 	mv "$i" "$i.notzero"
@@ -24,11 +29,6 @@ echo Renaming files back
 for i in _site/**/*.notzero; do
 	mv "$i" "${i%%.notzero}"
 done
-
-if [[ "$AMWA_ID" == "NMOS" ]]; then
-    echo Making specs.json
-    .scripts/make-specs-json.sh
-fi
 
 echo Checking for zero length files
 find _site -size 0 -print
