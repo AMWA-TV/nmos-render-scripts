@@ -116,10 +116,9 @@ function do_tree {
             (
                 cd "$dir" || exit 1
 
+                # NMOS-PARAMETER-REGISTERS has its own table
                 if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-                    for reg in capabilities common device-control-types device-types flow-attributes formats node-service-types tags transports transport-parameters; do
-                        echo "- [$reg]($reg)" >> "$INDEX"
-                    done
+                    echo "{% include register_table.html %}" >> "$INDEX"
 
                 # NMOS-TESTING has numbered docs in docs/
                 elif [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
