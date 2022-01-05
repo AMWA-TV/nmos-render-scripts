@@ -76,7 +76,9 @@ function extract {
 
         # Param regs still a special case
         if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
-            cp -r capabilities common device-control-types device-types flow-attributes formats node-service-types tags transports transport-parameters "../$target_dir"
+            for id in $(yaml2json .render/_data/registers.yml | jq -r '.[].id'); do 
+                cp -r "$id" "../$target_dir"
+            done
             # Param reg JSONs that need rendering as HTML
                 for json in */*.json; do
                     render-json.sh -n "$json" "$json" > "../$target_dir/${json%%.json}.html"
