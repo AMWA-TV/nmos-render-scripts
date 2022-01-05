@@ -69,6 +69,11 @@ function extract {
             cp .htaccess "../$target_dir"
         fi
 
+        # Individual doc tables for NMOS
+        if [[ "$AMWA_ID" == "NMOS" ]]; then
+            cp -r is ms bcp info  ".."
+        fi
+
         # Param regs still a special case
         if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
             cp -r capabilities common device-control-types device-types flow-attributes formats node-service-types tags transports transport-parameters "../$target_dir"
