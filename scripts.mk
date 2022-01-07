@@ -14,6 +14,9 @@ indexes:
 fix-links:
 	.scripts/fix-links.sh
 
+data:
+	.scripts/make-data.sh
+
 layouts:
 	.scripts/make-layouts.sh
 

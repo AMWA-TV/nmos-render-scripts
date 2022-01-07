@@ -17,7 +17,7 @@
 set -o errexit
 shopt -s extglob globstar nullglob
 
-PATH=$PWD/.scripts:/usr/local/share/.config/yarn/global/node_modules/.bin:$PATH
+PATH=$PWD/.scripts:$PWD/node_modules/.bin:/usr/local/share/.config/yarn/global/node_modules/.bin:$PATH
 
 . get-config.sh
 
