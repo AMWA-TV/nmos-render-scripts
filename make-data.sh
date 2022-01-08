@@ -9,6 +9,11 @@ echo Creating _data files
 
 [[ ! -d _data ]] && mkdir _data
 
+if [[ -f ../spec.yml ]]; then
+	echo Making spec.json
+	yaml2json ../spec.yml > _data/spec.json
+fi
+
 # NMOS specs need to get specs.json from the index to populate their menus
 if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS" ]]; then
 	echo Getting specs.json
