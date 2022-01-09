@@ -36,10 +36,10 @@ fi
 
 if [[ -d "$DEFAULT_TREE/docs" ]]; then
 	echo Making docs.json
-	awk -F'^ *- \\[.*\\]\\(' '(NF>1){print $2}' "$DEFAULT_TREE/docs/README.md" | \
+	awk -F'^ *- \\[.*\\]\\(' '(NF>1){print $2}' "$DEFAULT_TREE/docs/index.md" | \
 	sed 's/\.html)$//' | \
 	jq -R -n '[inputs]' | \
-	jq '[.[] | {name: . | sub("_";" "), file: "\(.).html"}]' > _data/docs.json
+	jq '[.[] | {name: . | gsub("_"; " ") | sub("^[0-9.]* "; ""), file: "\(.).html"}]' > _data/docs.json
 	make_json_page docs
 fi
 
