@@ -34,12 +34,13 @@ if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
 	wget -O- -q https://specs.amwa.tv/nmos-parameter-registers/registers.json > _data/registers.json
 fi
 
+# TODO: sort what substitutions are really needed in the long jq line
 if [[ -d "$DEFAULT_TREE/docs" ]]; then
 	echo Making docs.json
 	awk -F'^ *- \\[.*\\]\\(' '(NF>1){print $2}' "$DEFAULT_TREE/docs/index.md" | \
 	sed 's/\.html)$//' | \
 	jq -R -n '[inputs]' | \
-	jq '[.[] | {name: . | gsub("_"; " ") | sub("^[0-9.]* "; ""), file: "\(.).html"}]' > _data/docs.json
+	jq '[.[] | {name: . | gsub("_"; " ") | sub("docs/"; "") | sub("^[0-9.]* ?"; ""), file: "\(. | sub("docs/"; "")).html"}]' > _data/docs.json
 	make_json_page docs
 fi
 
