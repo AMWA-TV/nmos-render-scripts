@@ -18,9 +18,16 @@ echo Creating _data files
 
 [[ ! -d _data ]] && mkdir _data
 
-if [[ -f ../spec.yml ]]; then
-	echo Making spec.json
-	yaml2json ../spec.yml > _data/spec.json
+for i in spec spec_list registers; do
+    if [[ -f "../$i.yml" ]]; then
+            echo Making "$i.json"
+            yaml2json "../$i.yml" > "_data/$i.json"
+    fi
+done
+
+if [[ -f ../registers.yml ]]; then
+	echo Making registers.json
+	yaml2json ../registers.yml > _data/registers.json
 fi
 
 # NMOS specs need to get specs.json from the index to populate their menus
