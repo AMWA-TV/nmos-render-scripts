@@ -15,7 +15,7 @@ if [[ "$AMWA_ID" == "NMOS" ]]; then
 fi
 
 echo Renaming files to prevent zero-length issue
-find branches releases -name '*.png' -o -name '*.js' -o -name '*.css' -exec mv {} {}.nonzero \;
+find branches releases \( -name '*.png' -o -name '*.js' -o -name '*.css' \) -exec mv {} {}.nonzero \;
 
 echo Building site
 bundle exec jekyll build
