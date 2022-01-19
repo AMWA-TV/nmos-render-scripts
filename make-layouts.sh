@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 
-# shellcheck source=get-config.sh
-. "$(dirname "${BASH_SOURCE[0]}")/get-config.sh"
+# Make the dirs required for Jekyll, copy common files from layouts repo, 
+# and copy any local files, overwriting as required. 
 
 set -o errexit
+shopt -s nullglob
 
 echo Setting up layouts
 
-git clone --single-branch --branch main https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/nmos-doc-layouts .layouts
-rm -rf _layouts assets
-mv .layouts/_layouts .
-mv .layouts/assets .
-[[ ! -d _includes ]] && mkdir _includes # nmos repo already has it
-mv .layouts/_includes/* _includes/
-rm -rf .layouts
-
-# NMOS specs need to get specs.json from the index to populate their menus
-if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS" ]]; then
-	echo Getting specs.json
-	wget -O- -q https://specs.amwa.tv/nmos/specs.json > _data/specs.json
+if [[ -d .layouts ]]; then
+	echo "Warning: .layouts exists so not cloning"
+else
+	git clone --single-branch --branch "${NMOS_DOC_LAYOUTS_BRANCH:-main}" https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/nmos-doc-layouts .layouts
 fi
 
-if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
-	echo Getting registers.json
-	wget -O- -q https://specs.amwa.tv/nmos-parameter-registers/registers.json > _data/registers.json
-fi
+for dir in _layouts _includes assets/css assets/images; do
+	[[ ! -d "$dir" ]] && mkdir -p "$dir"
+	for file in ".layouts/$dir"/*; do
+		cp "$file" "$dir/"
+	done
+	for file in "_local/$dir"/*; do
+		cp "$file" "$dir/"
+	done
+done
+
+exit 0
