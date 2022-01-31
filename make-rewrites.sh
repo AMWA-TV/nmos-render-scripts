@@ -37,16 +37,18 @@ if [[ -d releases ]]; then
         fi
     done
     echo Making latest release rewrite rules
-    find releases -maxdepth 1 -type d -name 'v*' | sort | sed s:releases/:: | awk -F. '
+    # This sorts the releases in semantic order and selects the last release
+    # for each major.minor version and the last overall
+    find releases -maxdepth 1 -type d -name 'v*' | sed s:releases/v:: | sort -V | awk -F. '
 {
     latest[sprintf("%s.%s", $1, $2)] = $0
 }
 END {
     for (v in latest) {
-        printf("RewriteRule ^%s(.*) releases/%s$1\n", v, latest[v])
+        printf("RewriteRule ^%s(.*) releases/v%s$1\n", v, latest[v])
         overall_latest = latest[v]
     }
-    printf("RewriteRule ^latest(.*) releases/%s$1\n", overall_latest)
+    printf("RewriteRule ^latest(.*) releases/v%s$1\n", overall_latest)
 }
 ' >> $HTACCESS
 fi
