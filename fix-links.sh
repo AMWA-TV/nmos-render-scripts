@@ -60,7 +60,7 @@ if [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
         perl -pi -e "s~\]\($1~]($2~g;" "$3"
    }
 
-    rewrite_link docs/images/ branches/master/docs/images/ index.md
+    rewrite_link docs/ branches/master/docs/ index.md
 
     for tree in {branches,releases}/*; do
         [[ ! -d "$tree" ]] && continue
