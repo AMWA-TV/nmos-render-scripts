@@ -226,7 +226,11 @@ fi
 # Add the default links at the top - correct the links while copying text
 if [ "$DEFAULT_TREE" ]; then
     echo "Adding in contents of $INDEX for default tree $DEFAULT_TREE"
-    sed "s:](:]($DEFAULT_TREE/:" "$DEFAULT_TREE/$INDEX" >> "$INDEX"
+    if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
+        echo "Please select a release or branch from below to see the table of parameter registers" >> "$INDEX"
+    else
+        sed "s:](:]($DEFAULT_TREE/:" "$DEFAULT_TREE/$INDEX" >> "$INDEX"
+    fi
 fi
 
 # TODO: DRY on the following...
