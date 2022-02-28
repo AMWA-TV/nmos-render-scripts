@@ -145,7 +145,7 @@ function do_tree {
 
                         if compgen -G "docs/[1-9].*.md" > /dev/null ; then
                             echo "Adding numbered docs"
-                            for doc in docs/*.md; do
+                            for doc in docs/[1-9]*.md; do
                                 add_numbered_doc "$doc"
                             done
                         elif [ -f docs/README.md ] ; then
