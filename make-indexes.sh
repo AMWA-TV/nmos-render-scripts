@@ -129,7 +129,7 @@ function do_tree {
                         done
                     fi
 
-                # Other repos may have (possibly numbered) docs/, APIs/, APIs/schemas/, examples/
+                # Other repos may have (possibly numbered) docs/, APIs/, APIs/schemas/, schemas/, examples/
                 else
                     if [[ "$label" == "branch" && "$dirname" == "main" ]]; then
                         # avoid "...for branch main" in repos where that might cause confusion
@@ -177,6 +177,15 @@ function do_tree {
                             no_ext="${schema%%.html}"
                             linktext="${no_ext##*/}"
                             echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
+                        done
+                    elif [ -d schemas ]; then # this is for schemas at top-level, not under APIs/
+                        INDEX_SCHEMAS="schemas/$INDEX"
+                        echo -e "\n### [Schemas](schemas/) $tree_text\n" >> "$INDEX"
+                        echo -e "## Schemas $tree_text\n" > "$INDEX_SCHEMAS"
+                        for example in schemas/*.html; do
+                            no_ext="${example%%.html}"
+                            linktext="${no_ext##*/}"
+                            echo "- [$linktext](${example##*/})" >> "$INDEX_SCHEMAS"
                         done
                     fi
 

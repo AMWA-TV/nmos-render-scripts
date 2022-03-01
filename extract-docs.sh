@@ -88,7 +88,7 @@ function extract {
 
 
 
-        # Other repos have some or all of docs/, APIs/, examples/
+        # Other repos have some or all of docs/, APIs/, APIs/schemas/, schemas/, examples/
         else
             if [ -d docs ]; then
             (
@@ -219,6 +219,25 @@ EOF
                     rm -rf schemas/with-refs schemas/resolved
                 fi
             ) # APIs
+            fi
+            if [ -d schemas ]; then # this is for schemas at top-level, not under APIs/
+            (
+                echo "Rendering schemas"
+                cd schemas || exit 1
+                    for i in **/*.json; do
+                        flat=${i//*\//}
+                        HTML_EXAMPLE=${flat%%.json}.html
+                        render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
+                    done
+                    echo "Moving schemas"
+                    mkdir "../../$target_dir/schemas"
+                    for i in *.html; do
+                        mv "$i" "../../$target_dir/schemas"
+                    done
+                    cp ../../.scripts/json-formatter.js "../../$target_dir/schemas"
+                    cp -r ../../.scripts/codemirror "../../$target_dir/schemas"
+ 
+            )
             fi
             if [ -d examples ]; then
             (
