@@ -52,6 +52,59 @@ function add_nav_links {
     sed -i -e "3i$string\\n" -e "\$a\\\n$string" "$file"
 }
 
+# Render with-refs and resolved versions of JSON schemas in the specified relative path
+function render_schemas {
+    schemas_dir="$1" 
+
+    (
+        cd "$schemas_dir" || exit 1
+        echo "Resolving schema references"
+        mkdir with-refs resolved
+        for i in *.json; do
+            if ! resolve-schema.py "$i" > "resolved/$i" ; then
+                echo "WARNING: Resolving failed: resolved/$i may include \$refs"
+                cp "$i" "resolved/$i"
+            fi
+            mv "$i" with-refs/
+            cp "resolved/$i" "$i"
+        done
+    )
+
+    echo "Rendering with-refs schema"
+    for i in "$schemas_dir/with-refs"/*.json; do
+        HTML_SCHEMA=${i%%.json}.html
+        HTML_SCHEMA_TAIL="with-refs/${HTML_SCHEMA##*/}" # e.g. with-refs/name.html
+        render-json.sh -n "$i" "Schema ${i##*/}" "../${HTML_SCHEMA_TAIL/with-refs/resolved}" "Resolve referenced schemas (may reorder keys)" > "$HTML_SCHEMA"
+    done
+    echo "Rendering resolved schemas"
+    for i in "$schemas_dir/resolved"/*.json; do
+        HTML_SCHEMA=${i%%.json}.html
+        HTML_SCHEMA_TAIL="resolved/${HTML_SCHEMA##*/}" # e.g. resolved/name.html
+        render-json.sh "$i" "Schema ${i##*/}" "../${HTML_SCHEMA_TAIL/resolved/with-refs}" "Show original (referenced schemas with \$ref)" > "$HTML_SCHEMA"
+    done
+    echo "Moving schemas"
+    pwd
+    mkdir "../$target_dir/$schemas_dir"
+    mkdir "../$target_dir/$schemas_dir/with-refs"
+    cp ../.scripts/json-formatter.js "../$target_dir/$schemas_dir/with-refs"
+    cp -r ../.scripts/codemirror "../$target_dir/$schemas_dir/with-refs"
+    for i in "$schemas_dir/with-refs"/*.html; do
+        mv "$i" "../$target_dir/$schemas_dir/with-refs"
+    done
+    mkdir "../$target_dir/$schemas_dir/resolved"
+    cp ../.scripts/json-formatter.js "../$target_dir/$schemas_dir/resolved"
+    cp -r ../.scripts/codemirror "../$target_dir/$schemas_dir/resolved"
+    for i in "$schemas_dir/resolved"/*.html; do
+        mv "$i" "../$target_dir/$schemas_dir/resolved"
+    done
+    echo "Tidying"
+    # Restore things how they were to ensure next checkout doesn't overwrite
+    for i in "$schemas_dir/with-refs/"*.json; do
+        mv "$i" "$schemas_dir/"
+    done
+    rm -rf "$schemas_dir/with-refs" "$schemas_dir/resolved"
+
+}
 
 function extract {
     checkout=$1
@@ -150,19 +203,7 @@ function extract {
             if [ -d APIs ]; then
             (
                 cd APIs || exit 1
-                (
-                    cd schemas || exit 1
-                    echo "Resolving schema references"
-                    mkdir with-refs resolved
-                    for i in *.json; do
-                        if ! resolve-schema.py "$i" > "resolved/$i" ; then
-                            echo "WARNING: Resolving failed: resolved/$i may include \$refs"
-                            cp "$i" "resolved/$i"
-                        fi
-                        mv "$i" with-refs/
-                        cp "resolved/$i" "$i"
-                    done
-                )
+
                 for i in *.raml; do
                     HTML_API=${i%%.raml}.html
                     echo "Generating $HTML_API from $i"
@@ -186,59 +227,18 @@ EOF
 
                 cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/"
 
-                if [ -d schemas ]; then
-                    echo "Rendering with-refs schemas"
-                    for i in schemas/with-refs/*.json; do
-                        HTML_SCHEMA=${i%%.json}.html
-                        render-json.sh -n "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/with-refs/resolved}" "Resolve referenced schemas (may reorder keys)" > "$HTML_SCHEMA"
-                    done
-                    echo "Rendering resolved schemas"
-                    for i in schemas/resolved/*.json; do
-                        HTML_SCHEMA=${i%%.json}.html
-                        render-json.sh "$i" "Schema ${i##*/}" "../../${HTML_SCHEMA/resolved/with-refs}" "Show original (referenced schemas with \$ref)" > "$HTML_SCHEMA"
-                    done
-                    echo "Moving schemas"
-                    mkdir "../../$target_dir/APIs/schemas"
-                    mkdir "../../$target_dir/APIs/schemas/with-refs"
-                    cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/with-refs"
-                    cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/with-refs"
-                    for i in schemas/with-refs/*.html; do
-                        mv "$i" "../../$target_dir/APIs/schemas/with-refs"
-                    done
-                    mkdir "../../$target_dir/APIs/schemas/resolved"
-                    cp ../../.scripts/json-formatter.js "../../$target_dir/APIs/schemas/resolved"
-                    cp -r ../../.scripts/codemirror "../../$target_dir/APIs/schemas/resolved"
-                    for i in schemas/resolved/*.html; do
-                        mv "$i" "../../$target_dir/APIs/schemas/resolved"
-                    done
-                    echo "Tidying"
-                    # Restore things how they were to ensure next checkout doesn't overwrite
-                    for i in schemas/with-refs/*.json; do
-                        mv "$i" schemas/
-                    done
-                    rm -rf schemas/with-refs schemas/resolved
-                fi
-            ) # APIs
+             ) # APIs
             fi
+
+            if [ -d APIs/schemas ]; then
+                render_schemas APIs/schemas
+            fi
+
+
             if [ -d schemas ]; then # this is for schemas at top-level, not under APIs/
-            (
-                echo "Rendering schemas"
-                cd schemas || exit 1
-                    for i in **/*.json; do
-                        flat=${i//*\//}
-                        HTML_EXAMPLE=${flat%%.json}.html
-                        render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
-                    done
-                    echo "Moving schemas"
-                    mkdir "../../$target_dir/schemas"
-                    for i in *.html; do
-                        mv "$i" "../../$target_dir/schemas"
-                    done
-                    cp ../../.scripts/json-formatter.js "../../$target_dir/schemas"
-                    cp -r ../../.scripts/codemirror "../../$target_dir/schemas"
- 
-            )
+                render_schemas schemas 
             fi
+
             if [ -d examples ]; then
             (
                 echo "Rendering examples"

@@ -103,6 +103,20 @@ function add_possibly_nested_example {
     echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
 }
 
+function do_schemas_index
+{
+    schemas_dir="$1" 
+
+    INDEX_SCHEMAS="$schemas_dir/$INDEX"
+    echo -e "\n### [JSON Schemas]($schemas_dir) $tree_text\n" >> "$INDEX"
+    echo -e "## JSON Schemas $tree_text\n" > "$INDEX_SCHEMAS"
+    for schema in "$schemas_dir/with-refs/"*.html; do
+        no_ext="${schema%%.html}"
+        linktext="${no_ext##*/}"
+        echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
+    done
+}
+
 function do_tree {
     tree=$1
     label=$2 # because of spelling of plurals
@@ -170,23 +184,9 @@ function do_tree {
                     fi
 
                     if [ -d APIs/schemas ]; then
-                        INDEX_SCHEMAS="APIs/schemas/$INDEX"
-                        echo -e "\n### [JSON Schemas](APIs/schemas/) $tree_text\n" >> "$INDEX"
-                        echo -e "## JSON Schemas $tree_text\n" > "$INDEX_SCHEMAS"
-                        for schema in APIs/schemas/with-refs/*.html; do
-                            no_ext="${schema%%.html}"
-                            linktext="${no_ext##*/}"
-                            echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
-                        done
-                    elif [ -d schemas ]; then # this is for schemas at top-level, not under APIs/
-                        INDEX_SCHEMAS="schemas/$INDEX"
-                        echo -e "\n### [Schemas](schemas/) $tree_text\n" >> "$INDEX"
-                        echo -e "## Schemas $tree_text\n" > "$INDEX_SCHEMAS"
-                        for example in schemas/*.html; do
-                            no_ext="${example%%.html}"
-                            linktext="${no_ext##*/}"
-                            echo "- [$linktext](${example##*/})" >> "$INDEX_SCHEMAS"
-                        done
+                        do_schemas_index APIs/schemas
+                    elif [ -d schemas ]; then
+                        do_schemas_index schemas
                     fi
 
                     if [ -d examples ]; then
