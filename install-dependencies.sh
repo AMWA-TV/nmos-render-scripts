@@ -10,7 +10,7 @@ set -o errexit
 . .scripts/get-config.sh
 
 # Just install these for specs that need them
-if [[ -d ../APIs || -d ../examples ]]; then
+if [[ -d ../APIs || -d testingfacade/APIs || -d ../examples ]]; then
     rm -rf raml2html-nmos-theme
     git clone https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/raml2html-nmos-theme
     cp .scripts/package.json .
