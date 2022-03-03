@@ -215,13 +215,13 @@ function render_examples {
 
 }
 
-# Render WebIDL in the specified relative path -- treating as JSON for now :-o
+# Render WebIDL in the specified relative path
 function render_webidl {
     webidl_dir=$1
 
     for i in "$webidl_dir"/*.webidl; do
         HTML_EXAMPLE=${i%%.webidl}.html
-        render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
+        render-webidl.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
     done
 
     echo "Moving webidl"
