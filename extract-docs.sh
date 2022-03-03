@@ -102,8 +102,14 @@ function render_docs {
         exit 1
     fi
 
-    if [ -d images ] ; then
-        cp -r images "../$target_dir/$docs_dir"
+    if [ -d "$docs_dir/images" ] ; then
+        echo "Copying images"
+        cp -r "$docs_dir/images" "../$target_dir/$docs_dir"
+    fi
+
+    if [ -d "$docs_dir/idl" ] ; then
+        echo "Copying idl"
+        cp -r "$docs_dir/idl" "../$target_dir/$docs_dir"
     fi
 }
 
