@@ -211,6 +211,26 @@ function render_examples {
         mv "$i" "../$target_dir/$examples_dir"
     done
     cp ../.scripts/json-formatter.js "../$target_dir/$examples_dir"
+    cp -r ../.scripts/codemirror "../$target_dir/$examples_dir"
+
+}
+
+# Render WebIDL in the specified relative path -- treating as JSON for now :-o
+function render_webidl {
+    webidl_dir=$1
+
+    for i in "$webidl_dir"/*.webidl; do
+        HTML_EXAMPLE=${i%%.webidl}.html
+        render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
+    done
+
+    echo "Moving webidl"
+    mkdir -p "../$target_dir/$webidl_dir"
+    for i in "$webidl_dir"/*.html; do
+        mv "$i" "../$target_dir/$webidl_dir"
+    done
+    cp -r ../.scripts/codemirror "../$target_dir/$webidl_dir"
+
 }
 
 function extract_and_render {
@@ -277,9 +297,13 @@ function extract_and_render {
             if [ -d examples ]; then
                 render_examples examples
             fi
-            
+
             if [ -d testingfacade/examples ]; then
                 render_examples testingfacade/examples
+            fi
+
+            if [ -d docs/idl ]; then
+                render_webidl docs/idl
             fi
         fi # AMWA_ID
     )
