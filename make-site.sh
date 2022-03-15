@@ -9,9 +9,12 @@ shopt -s globstar nullglob
 echo Removing source-repo
 rm -rf source-repo
 
-if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "NMOS-DASHBOARD" ]]; then
+if [[ "$AMWA_ID" == "NMOS" ]]; then
     echo Making _data/specs.json
     .scripts/make-specs-json.sh
+elif [[ "$AMWA_ID" == "NMOS-DASHBOARD" ]]; then
+    echo Making _data/dashboard.json
+    .scripts/make-dashboard-json.sh
 fi
 
 echo Renaming files to prevent zero-length issue
