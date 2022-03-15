@@ -7,6 +7,12 @@ set -o errexit
 
 # The $SSH_ env variables are provided by GitHub secret
 
+
+[[ -z "$SSH_USER" ]] && echo "SSH_USER not set" && exit 1
+[[ -z "$SSH_HOST" ]] && echo "SSH_HOST not set" && exit 1
+[[ -z "$SSH_PRIVATE_KEY" ]] && echo "SSH_PRIVATE_KEY not set" && exit 1
+[[ -z "$SSH_KNOWN_HOSTS" ]] && echo "SSH_KNOWN_HOSTS not set" && exit 1
+
 dest="/var/www/$SPEC_SERVER/$SITE_NAME"
 
 if [[ -e .ssh ]]; then

@@ -29,10 +29,10 @@ else
 fi
 
 REPO_NAME="${REPO_ADDRESS##*/}"
-BASEURL="$(awk '/baseurl:/ { print $2 }' $_CONFIG_YML)"
+BASEURL="$(awk '/^\s*baseurl:/ { print $2 }' $_CONFIG_YML)"
 SITE_NAME="${BASEURL#/}"
-AMWA_ID="$(awk '/amwa_id:/ { print $2 }' $_CONFIG_YML)"
-DEFAULT_TREE="$(awk '/default_tree:/ { print $2 }' $_CONFIG_YML)"
-SHOW_RELEASES="$(awk '/show_releases:/ { print $2 }' $_CONFIG_YML)"
-SHOW_BRANCHES="$(awk '/show_branches:/ { print $2 }' $_CONFIG_YML)"
-SPEC_SERVER="$(awk '/spec_server/ { print $2 }' $_CONFIG_YML)"
+AMWA_ID="$(awk '/^\s*amwa_id:/ { print $2 }' $_CONFIG_YML)"
+DEFAULT_TREE="$(awk '/^\s*default_tree:/ { print $2 }' $_CONFIG_YML)"
+SHOW_RELEASES="$(awk '/^\s*show_releases:/ { print $2 }' $_CONFIG_YML)"
+SHOW_BRANCHES="$(awk '/^\s*show_branches:/ { print $2 }' $_CONFIG_YML)"
+SPEC_SERVER="$(awk '/^\s*spec_server:/ { print $2 }' $_CONFIG_YML)"
