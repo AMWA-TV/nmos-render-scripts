@@ -30,6 +30,9 @@ function process_file {
     # Change .raml links to .html
     perl -pi -e 's:\.raml\):.html\):g;' "$1"
 
+    # Change .webidl links to .html
+    perl -pi -e 's:\.webidl\):.html\):g;' "$1"
+
     # Change .json links to .html and use with-refs for schemas (but not for schema indexes)
     perl -pi -e 's:\.json\):.html\):g; s:/APIs/schemas/([^)]+):/APIs/schemas/with-refs/$1:g;' "$1"
 

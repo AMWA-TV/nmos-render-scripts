@@ -9,7 +9,7 @@ shopt -s globstar nullglob
 echo Removing source-repo
 rm -rf source-repo
 
-if [[ "$AMWA_ID" == "NMOS" ]]; then
+if [[ "$AMWA_ID" == "NMOS" || "$AMWA_ID" == "NMOS-DASHBOARD" ]]; then
     echo Making _data/specs.json
     .scripts/make-specs-json.sh
 fi

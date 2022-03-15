@@ -64,10 +64,24 @@ if [[ -d "$DEFAULT_TREE/APIs" ]]; then
 	make_json_page apis
 fi
 
+# Schemas normally under APIs...
 if [[ -d "$DEFAULT_TREE/APIs/schemas/with-refs" ]]; then
 	echo Making schemas.json
 	(
 		cd "$DEFAULT_TREE/APIs/schemas/with-refs" || exit 1
+		for file in *.html; do
+			echo "${file%.html}"
+		done
+	) | \
+	jq -R -n '[inputs]'	| \
+	jq '[.[] | {name: ., file: "\(.).html"}]' > _data/schemas.json
+	make_json_page schemas
+
+# ...but not always...
+elif [[ -d "$DEFAULT_TREE/schemas" ]]; then
+	echo Making schemas.json
+	(
+		cd "$DEFAULT_TREE/schemas" || exit 1
 		for file in *.html; do
 			echo "${file%.html}"
 		done

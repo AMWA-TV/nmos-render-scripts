@@ -103,6 +103,72 @@ function add_possibly_nested_example {
     echo "- [${doc%%.md}]($underscore_space_doc)" >> "$INDEX"
 }
 
+function do_docs_index
+{
+    docs_dir="$1"
+
+    INDEX_DOCS="$docs_dir/$INDEX"
+    echo -e "\n## Documentation $tree_text\n" >> "$INDEX"
+    echo -e "## Documentation $tree_text\n" > "$INDEX_DOCS"
+
+    if compgen -G "docs/[1-9].*.md" > /dev/null ; then
+        echo "Adding numbered docs"
+        for doc in "$docs_dir"/*.md; do
+            add_numbered_doc "$doc"
+        done
+    elif [ -f "$docs_dir/README.md" ] ; then
+        echo Adding docs from list in README.md
+        add_docs_from_markdown_list_of_links "$docs_dir/README.md"
+    else
+        echo No numbered docs or README.md found
+        exit 1
+    fi
+}
+function do_apis_index
+{
+    apis_dir="$1"
+
+    INDEX_APIS="$apis_dir/$INDEX"
+    echo -e "\n## APIs $tree_text\n" >> "$INDEX"
+    echo -e "## APIs $tree_text\n" > "$INDEX_APIS"
+    for api in "$apis_dir"/*.html; do
+        no_ext="${api%%.html}"
+        linktext="${no_ext##*/}"
+        echo "- [$linktext](${api##*/})" >> "$INDEX_APIS"
+        echo "- [$linktext]($api)" >> "$INDEX"
+    done
+
+}
+
+function do_schemas_index
+{
+    schemas_dir="$1" 
+
+    INDEX_SCHEMAS="$schemas_dir/$INDEX"
+    echo -e "\n### [JSON Schemas]($schemas_dir) $tree_text\n" >> "$INDEX"
+    echo -e "## JSON Schemas $tree_text\n" > "$INDEX_SCHEMAS"
+    for schema in "$schemas_dir/with-refs"/*.html; do
+        no_ext="${schema%%.html}"
+        linktext="${no_ext##*/}"
+        echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
+    done
+}
+
+function do_examples_index
+{
+    examples_dir="$1"
+
+    INDEX_EXAMPLES="$examples_dir/$INDEX"
+    echo -e "\n### [Examples]($examples_dir) $tree_text\n" >> "$INDEX"
+    echo -e "## Examples $tree_text\n" > "$INDEX_EXAMPLES"
+    for example in "$examples_dir"/*.html; do
+        no_ext="${example%%.html}"
+        linktext="${no_ext##*/}"
+        echo "- [$linktext](${example##*/})" >> "$INDEX_EXAMPLES"
+    done
+
+}
+
 function do_tree {
     tree=$1
     label=$2 # because of spelling of plurals
@@ -120,16 +186,7 @@ function do_tree {
                 if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
                     echo "{% include register_table.html %}" >> "$INDEX"
 
-                # NMOS-TESTING has numbered docs in docs/
-                elif [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
-                    if [ -d docs ]; then
-                        INDEX_DOCS="docs/$INDEX"
-                        for doc in docs/[1-9]*.md; do
-                            add_numbered_doc "$doc"
-                        done
-                    fi
-
-                # Other repos may have (possibly numbered) docs/, APIs/, APIs/schemas/, examples/
+                # Other repos may have (possibly numbered) docs/, APIs/, APIs/schemas/, schemas/, examples/
                 else
                     if [[ "$label" == "branch" && "$dirname" == "main" ]]; then
                         # avoid "...for branch main" in repos where that might cause confusion
@@ -138,57 +195,27 @@ function do_tree {
                         tree_text="for $label $dirname"
                     fi
                     if [ -d docs ]; then
-                        INDEX_DOCS="docs/$INDEX"
-                        echo -e "\n## Documentation $tree_text\n" >> "$INDEX"
-                        echo -e "## Documentation $tree_text\n" > "$INDEX_DOCS"
-
-
-                        if compgen -G "docs/[1-9].*.md" > /dev/null ; then
-                            echo "Adding numbered docs"
-                            for doc in docs/[1-9]*.md; do
-                                add_numbered_doc "$doc"
-                            done
-                        elif [ -f docs/README.md ] ; then
-                            echo Adding docs from list in README.md
-                            add_docs_from_markdown_list_of_links docs/README.md
-                        else
-                            echo No numbered docs or README.md found
-                            exit 1
-                        fi
+                        do_docs_index docs
                     fi
 
                     if [ -d APIs ]; then
-                        INDEX_APIS="APIs/$INDEX"
-                        echo -e "\n## APIs $tree_text\n" >> "$INDEX"
-                        echo -e "## APIs $tree_text\n" > "$INDEX_APIS"
-                        for api in APIs/*.html; do
-                            no_ext="${api%%.html}"
-                            linktext="${no_ext##*/}"
-                            echo "- [$linktext](${api##*/})" >> "$INDEX_APIS"
-                            echo "- [$linktext]($api)" >> "$INDEX"
-                        done
+                        do_apis_index APIs
+                    elif [ -d testingfacade/APIs ]; then
+                        do_apis_index testingfacade/APIs
                     fi
 
                     if [ -d APIs/schemas ]; then
-                        INDEX_SCHEMAS="APIs/schemas/$INDEX"
-                        echo -e "\n### [JSON Schemas](APIs/schemas/) $tree_text\n" >> "$INDEX"
-                        echo -e "## JSON Schemas $tree_text\n" > "$INDEX_SCHEMAS"
-                        for schema in APIs/schemas/with-refs/*.html; do
-                            no_ext="${schema%%.html}"
-                            linktext="${no_ext##*/}"
-                            echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
-                        done
+                        do_schemas_index APIs/schemas
+                    elif [ -d schemas ]; then
+                        do_schemas_index schemas
+                    elif [ -d testingfacade/APIs/schemas ]; then
+                        do_schemas_index testingfacade/APIs/schemas 
                     fi
 
                     if [ -d examples ]; then
-                        INDEX_EXAMPLES="examples/$INDEX"
-                        echo -e "\n### [Examples](examples/) $tree_text\n" >> "$INDEX"
-                        echo -e "## Examples $tree_text\n" > "$INDEX_EXAMPLES"
-                        for example in examples/*.html; do
-                            no_ext="${example%%.html}"
-                            linktext="${no_ext##*/}"
-                            echo "- [$linktext](${example##*/})" >> "$INDEX_EXAMPLES"
-                        done
+                        do_examples_index examples
+                    elif [ -d testingfacade/examples ]; then
+                        do_examples_index testingfacade/examples
                     fi
 
                 fi
