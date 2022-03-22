@@ -24,7 +24,11 @@ for id in $spec_list; do
 	echo "$id"
 	wget -O- -q "https://specs.amwa.tv/${id,,}/spec.json" > "$SPEC"
 	wget -O- -q --header "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/AMWA-TV/${id,,}/issues" | \
-		jq '{ num_issues: [.[] | select(.pull_request == null)] | length, num_pulls: [.[] | select(.pull_request != null)] | length}' > "$ISSUES"
+		jq '{
+			num_issues: [.[] | select(.pull_request == null)] | length,
+			num_pulls: [.[] | select(.pull_request != null)] | length,
+			num_triage: [.[] | .labels | any(.name == "triage") | select(.)] | length
+		}' > "$ISSUES"
 	jq --slurp '.[0] * .[1]' "$SPEC" "$ISSUES" >> "$CONCAT"
 done
 echo
