@@ -11,7 +11,7 @@ echo Setting up layouts
 if [[ -d .layouts ]]; then
 	echo "Warning: .layouts exists so not cloning"
 else
-	git clone --single-branch --branch "${NMOS_DOC_LAYOUTS_BRANCH:-main}" https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/nmos-doc-layouts .layouts
+	git clone --single-branch --branch "${NMOS_DOC_LAYOUTS_BRANCH:-main}" https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/nmos-render-layouts .layouts
 fi
 
 for dir in _layouts _includes assets/css assets/images; do
