@@ -11,10 +11,11 @@ RUN apk add --no-cache --update \
     perl \
     ed \
     openssh \
-    jq
+    jq \
+    py3-pip
 
 # Python modules 
-RUN pip3 install --upgrade pip && pip3 install \
+RUN pip install --upgrade pip && pip install \
     setuptools \
     jsonref \
     pathlib

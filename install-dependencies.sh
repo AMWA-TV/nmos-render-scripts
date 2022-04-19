@@ -15,8 +15,8 @@ if [[ -d ../APIs || -d ../testingfacade/APIs || -d ../examples ]]; then
     git clone https://${GITHUB_TOKEN:+${GITHUB_TOKEN}@}github.com/AMWA-TV/raml2html-nmos-theme
     cp .scripts/package.json .
     yarn install
-    pip3 install setuptools
-    pip3 install jsonref pathlib
+    pip install setuptools
+    pip install jsonref pathlib
 fi
 
 # Param regs is a special case
