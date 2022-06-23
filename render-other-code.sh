@@ -23,7 +23,7 @@ else
     SHOW_LINE_NUMBERS=false
 fi
 
-WEBIDL_FILE=$1
+CODE_FILE=$1
 NAME=$2
 ALT_HREF=$3
 ALT_TEXT=$4
@@ -53,12 +53,11 @@ cat <<EOF
 <div id="json-render">
 EOF
 
-if $LINT "$WEBIDL_FILE" ; then
+if $LINT "$CODE_FILE" ; then
 
     cat <<-EOF
 <script type="text/javascript" src="codemirror/lib/codemirror.js"></script>
 <link rel="stylesheet" href="codemirror/lib/codemirror.css">
-<script src="codemirror/mode/webidl/webidl.js"></script>
 
 <style>
   .CodeMirror {
@@ -71,7 +70,7 @@ if $LINT "$WEBIDL_FILE" ; then
 <textarea id="mytextarea">
 EOF
 
-    cat "$WEBIDL_FILE"
+    cat "$CODE_FILE"
     cat <<-EOF
 </textarea>
 <script>
@@ -85,7 +84,7 @@ EOF
 
 else # Failed lint so do minimal render
     echo "<pre>"
-    cat "$WEBIDL_FILE"
+    cat "$CODE_FILE"
     echo "</pre>"
 fi
 
