@@ -205,6 +205,11 @@ function render_examples {
         render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
     done
 
+    for i in "$examples_dir"/*.sdp; do
+        HTML_EXAMPLE=${i%%.sdp}.html
+        render-other-code.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
+    done
+
     echo "Moving examples"
     mkdir -p "../$target_dir/$examples_dir"
     for i in "$examples_dir"/*.html; do
