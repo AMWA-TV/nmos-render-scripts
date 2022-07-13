@@ -307,7 +307,7 @@ function extract_and_render {
                 render_examples testingfacade/examples
             fi
 
-            if [ -d docs/idl ]; then
+            if [ -d APIs/idl ]; then
                 render_webidl docs/idl
             fi
         fi # AMWA_ID
