@@ -308,7 +308,7 @@ function extract_and_render {
             fi
 
             if [ -d APIs/idl ]; then
-                render_webidl docs/idl
+                render_webidl APIs/idl
             fi
         fi # AMWA_ID
     )
