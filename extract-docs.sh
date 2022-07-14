@@ -106,11 +106,6 @@ function render_docs {
         echo "Copying images"
         cp -r "$docs_dir/images" "../$target_dir/$docs_dir"
     fi
-
-    if [ -d "$docs_dir/idl" ] ; then
-        echo "Copying idl"
-        cp -r "$docs_dir/idl" "../$target_dir/$docs_dir"
-    fi
 }
 
 # Render RAML in the specified relative path
@@ -220,21 +215,21 @@ function render_examples {
 
 }
 
-# Render WebIDL in the specified relative path
+# Render Web IDL in the specified relative path
 function render_webidl {
-    webidl_dir=$1
+    idl_dir=$1
 
-    for i in "$webidl_dir"/*.webidl; do
+    for i in "$idl_dir"/*.webidl; do
         HTML_EXAMPLE=${i%%.webidl}.html
         render-webidl.sh -n "$i" "Framework definitions ${i##*/}" >> "$HTML_EXAMPLE"
     done
 
     echo "Moving webidl"
-    mkdir -p "../$target_dir/$webidl_dir"
-    for i in "$webidl_dir"/*.html; do
-        mv "$i" "../$target_dir/$webidl_dir"
+    mkdir -p "../$target_dir/$idl_dir"
+    for i in "$idl_dir"/*.html; do
+        mv "$i" "../$target_dir/$idl_dir"
     done
-    cp -r ../.scripts/codemirror "../$target_dir/$webidl_dir"
+    cp -r ../.scripts/codemirror "../$target_dir/$idl_dir"
 
 }
 
@@ -307,8 +302,8 @@ function extract_and_render {
                 render_examples testingfacade/examples
             fi
 
-            if [ -d APIs/idl ]; then
-                render_webidl APIs/idl
+            if [ -d idl ]; then
+                render_webidl idl
             fi
         fi # AMWA_ID
     )

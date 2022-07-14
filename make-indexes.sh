@@ -169,6 +169,23 @@ function do_examples_index
 
 }
 
+function do_idl_index
+{
+    set -x
+    idl_dir="$1"
+
+    INDEX_IDL="$idl_dir/$INDEX"
+    echo -e "\n### [Web IDL]($idl_dir) $tree_text\n" >> "$INDEX"
+    echo -e "## Web IDL $tree_text\n" > "$INDEX_IDL"
+    for webidl in "$idl_dir"/*.html; do
+        no_ext="${webidl%%.html}"
+        linktext="${no_ext##*/}"
+        echo "- [$linktext]($webidl)" >> "$INDEX"
+        echo "- [$linktext](${webidl##*/})" >> "$INDEX_IDL"
+    done
+    set +x
+}
+
 function do_tree {
     tree=$1
     label=$2 # because of spelling of plurals
@@ -186,7 +203,7 @@ function do_tree {
                 if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
                     echo "{% include register_table.html %}" >> "$INDEX"
 
-                # Other repos may have (possibly numbered) docs/, APIs/, APIs/schemas/, schemas/, examples/
+                # Other repos may have (possibly numbered) docs/, APIs/, APIs/schemas/, schemas/, examples/, idl/
                 else
                     if [[ "$label" == "branch" && "$dirname" == "main" ]]; then
                         # avoid "...for branch main" in repos where that might cause confusion
@@ -218,6 +235,9 @@ function do_tree {
                         do_examples_index testingfacade/examples
                     fi
 
+                    if [ -d idl ]; then
+                        do_idl_index idl
+                    fi
                 fi
             )
         done
