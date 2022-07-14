@@ -226,7 +226,7 @@ function render_webidl {
 
     for i in "$webidl_dir"/*.webidl; do
         HTML_EXAMPLE=${i%%.webidl}.html
-        render-webidl.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
+        render-webidl.sh -n "$i" "Framework definitions ${i##*/}" >> "$HTML_EXAMPLE"
     done
 
     echo "Moving webidl"
@@ -307,8 +307,8 @@ function extract_and_render {
                 render_examples testingfacade/examples
             fi
 
-            if [ -d docs/idl ]; then
-                render_webidl docs/idl
+            if [ -d APIs/idl ]; then
+                render_webidl APIs/idl
             fi
         fi # AMWA_ID
     )
