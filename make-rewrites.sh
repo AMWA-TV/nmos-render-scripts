@@ -45,7 +45,7 @@ if [[ -d releases ]]; then
 }
 END {
     for (v in latest) {
-        printf("RewriteRule ^%s(.*) releases/v%s$1\n", v, latest[v])
+        printf("RewriteRule ^v%s(.*) releases/v%s$1\n", v, latest[v])
         overall_latest = latest[v]
     }
     printf("RewriteRule ^latest(.*) releases/v%s$1\n", overall_latest)
