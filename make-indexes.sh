@@ -113,7 +113,7 @@ function do_docs_index
 
     if compgen -G "docs/[1-9].*.md" > /dev/null ; then
         echo "Adding numbered docs"
-        for doc in "$docs_dir"/*.md; do
+        for doc in "$docs_dir"/[1-9]*.md; do
             add_numbered_doc "$doc"
         done
     elif [ -f "$docs_dir/README.md" ] ; then
