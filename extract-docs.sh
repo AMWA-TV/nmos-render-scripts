@@ -21,11 +21,6 @@ PATH=$PWD/.scripts:$PWD/node_modules/.bin:/usr/local/share/.config/yarn/global/n
 
 . get-config.sh
 
-if [[ "$AMWA_ID" =~ "IS-" && ! -d /usr/local/share/.config/yarn/global/node_modules/.bin ]]; then
-    echo "fatal: Cannot find build tools (have you done 'make build-tools?')"
-    exit 1
-fi
-
 # Unfortunately bash doesn't have proper functions or scoping
 function make_label {
     local label="${1%%.md}"

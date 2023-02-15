@@ -27,27 +27,32 @@ chmod 700 .ssh
 echo "$SSH_PRIVATE_KEY" > .ssh/id_rsa && chmod 600 .ssh/id_rsa
 echo "$SSH_KNOWN_HOSTS" > .ssh/known_hosts && chmod 600 .ssh/known_hosts
 
-echo Making tar
-tar -czf "$SITE_NAME.tar.gz" _site
+tar_file="$SITE_NAME.tar.gz"
+echo "Making local tar file $tar_file"
+tar -czf "$tar_file" _site
 
 function do_ssh {
   # shellcheck disable=SC2029
   ssh -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SSH_USER@$SSH_HOST" "$@" || exit 1
 }
-echo Making destination directory
-do_ssh "mkdir $dest.new"
+echo Making destination directory:
+dest_new=$(do_ssh "mktemp -d $dest.XXXXXX")
+echo "$dest_new"
 
 echo Uploading
-scp -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$SITE_NAME.tar.gz" "$SSH_USER@$SSH_HOST:$dest.new/" || exit 1
+if ! scp -i .ssh/id_rsa -o UserKnownHostsFile=.ssh/known_hosts "$tar_file" "$SSH_USER@$SSH_HOST:$dest_new/"; then
+  do_ssh rm -rf "$dest_new"
+  exit 1
+fi
 
 echo Extracting
-do_ssh "cd $dest.new && tar --strip-components=1 -xf $SITE_NAME.tar.gz"
+do_ssh "cd $dest_new && tar --strip-components=1 -xf $tar_file"
 
 echo Replacing old site
-do_ssh "mv $dest $dest.old ; mv $dest.new $dest; rm -rf $dest.old"
+do_ssh "mv $dest $dest.old ; mv $dest_new $dest; chmod 775 $dest; rm -rf $dest.old"
 
-echo Deleting tar file
-rm "$SITE_NAME.tar.gz"
+echo Deleting local tar file
+rm "$tar_file"
 
 if [[ "$AMWA_ID" == "SPECS" ]]; then
     echo Setting top level .htaccess and 404 page
