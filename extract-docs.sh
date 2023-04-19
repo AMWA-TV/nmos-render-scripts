@@ -263,7 +263,7 @@ function extract_and_render {
 
         # Control feature sets a special case
         elif [[ "$AMWA_ID" == "NMOS-CONTROL-FEATURE-SETS" ]]; then
-            for id in $(yaml2json feature-sets.yml | jq -r '.[].id'); do 
+            for id in $(yaml2json feature_sets.yml | jq -r '.[].id'); do 
                 cp -r "$id" "../$target_dir"
             done
 
