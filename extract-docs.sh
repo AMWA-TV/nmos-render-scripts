@@ -261,7 +261,11 @@ function extract_and_render {
                     cp -r ../.scripts/codemirror "../$target_dir/${json%/*.json}/"
                 done
 
-
+        # Control feature sets a special case
+        if [[ "$AMWA_ID" == "NMOS-CONTROL-FEATURE-SETS" ]]; then
+            for id in $(yaml2json feature-sets.yml | jq -r '.[].id'); do 
+                cp -r "$id" "../$target_dir"
+            done
 
         # Other repos have some or all of docs/, APIs/, APIs/schemas/, schemas/, examples/
         else
