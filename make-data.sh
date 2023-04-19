@@ -18,7 +18,7 @@ echo Creating _data files
 
 [[ ! -d _data ]] && mkdir _data
 
-for i in spec spec_list registers; do
+for i in spec spec_list registers feature_sets; do
     if [[ -f "../$i.yml" ]]; then
             echo Making "$i.json"
             yaml2json "../$i.yml" > "_data/$i.json"
@@ -30,6 +30,11 @@ if [[ -f ../registers.yml ]]; then
 	yaml2json ../registers.yml > _data/registers.json
 fi
 
+if [[ -f ../feature_sets.yml ]]; then
+	echo Making feature_sets.json
+	yaml2json ../feature_sets.yml > _data/feature_sets.json
+fi
+
 # NMOS specs need to get specs.json from the index to populate their menus
 if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS" ]]; then
 	echo Getting specs.json
@@ -39,6 +44,11 @@ fi
 if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
 	echo Getting registers.json
 	wget -O- -q https://specs.amwa.tv/nmos-parameter-registers/registers.json > _data/registers.json
+fi
+
+if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS-CONTROL-FEATURE-SETS" ]]; then
+	echo Getting feature_sets.json
+	wget -O- -q https://specs.amwa.tv/nmos-control-feature-sets/feature_sets.json > _data/feature_sets.json
 fi
 
 # TODO: sort what substitutions are really needed in the long jq line
