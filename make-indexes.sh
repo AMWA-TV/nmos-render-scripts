@@ -203,6 +203,10 @@ function do_tree {
                 if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
                     echo "{% include register_table.html %}" >> "$INDEX"
 
+                # NMOS-CONTROL-FEATURE-SETS has its own table
+                if [[ "$AMWA_ID" == "NMOS-CONTROL-FEATURE-SETS" ]]; then
+                    echo "{% include feature-sets_table.html %}" >> "$INDEX"
+
                 # Other repos may have (possibly numbered) docs/, APIs/, APIs/schemas/, schemas/, examples/, idl/
                 else
                     if [[ "$label" == "branch" && "$dirname" == "main" ]]; then
@@ -265,6 +269,8 @@ if [[ "$AMWA_ID" == "NMOS-TESTING" ]]; then
     echo "## Documentation" >> "$INDEX"
 elif [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
     echo "## Parameter Registers" >> "$INDEX"
+elif [[ "$AMWA_ID" == "NMOS-CONTROL-FEATURE-SETS" ]]; then
+    echo "## Feature Sets" >> "$INDEX"
 elif [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS" && "$AMWA_ID" != "BCP-002" && "$AMWA_ID" != "BCP-003" ]]; then
     # Common intro for specs
     sed "s~%AMWA_ID%~${AMWA_ID}~g; s~%REPO_ADDRESS%~${REPO_ADDRESS}~g; s~%DEFAULT_TREE%~${DEFAULT_TREE}~g" "$INTRO_COMMON" >> "$INDEX"
@@ -275,6 +281,8 @@ if [ "$DEFAULT_TREE" ]; then
     echo "Adding in contents of $INDEX for default tree $DEFAULT_TREE"
     if [[ "$AMWA_ID" == "NMOS-PARAMETER-REGISTERS" ]]; then
         echo "Please select a release or branch from below to see the table of parameter registers" >> "$INDEX"
+    elif [[ "$AMWA_ID" == "NMOS-CONTROL-FEATURE-SETS" ]]; then
+        echo "Please select a release or branch from below to see the table of feature sets" >> "$INDEX"
     else
         sed "s:](:]($DEFAULT_TREE/:" "$DEFAULT_TREE/$INDEX" >> "$INDEX"
     fi
