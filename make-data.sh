@@ -30,6 +30,11 @@ if [[ -f ../registers.yml ]]; then
 	yaml2json ../registers.yml > _data/registers.json
 fi
 
+if [[ -f ../feature-sets.yml ]]; then
+	echo Making feature-sets.json
+	yaml2json ../feature-sets.yml > _data/feature-sets.json
+fi
+
 # NMOS specs need to get specs.json from the index to populate their menus
 if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS" ]]; then
 	echo Getting specs.json
@@ -39,6 +44,11 @@ fi
 if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
 	echo Getting registers.json
 	wget -O- -q https://specs.amwa.tv/nmos-parameter-registers/registers.json > _data/registers.json
+fi
+
+if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS-CONTROL-FEATURE-SETS" ]]; then
+	echo Getting feature-sets.json
+	wget -O- -q https://specs.amwa.tv/nmos-control-feature-sets/feature-sets.json > _data/feature-sets.json
 fi
 
 # TODO: sort what substitutions are really needed in the long jq line

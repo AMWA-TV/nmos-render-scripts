@@ -204,7 +204,7 @@ function do_tree {
                     echo "{% include register_table.html %}" >> "$INDEX"
 
                 # NMOS-CONTROL-FEATURE-SETS has its own table
-                if [[ "$AMWA_ID" == "NMOS-CONTROL-FEATURE-SETS" ]]; then
+                elif [[ "$AMWA_ID" == "NMOS-CONTROL-FEATURE-SETS" ]]; then
                     echo "{% include feature-sets_table.html %}" >> "$INDEX"
 
                 # Other repos may have (possibly numbered) docs/, APIs/, APIs/schemas/, schemas/, examples/, idl/
