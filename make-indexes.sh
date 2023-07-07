@@ -150,7 +150,7 @@ function do_schemas_index
     for schema in "$schemas_dir/with-refs"/*.html; do
         no_ext="${schema%%.html}"
         linktext="${no_ext##*/}"
-        echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html)" >> "$INDEX_SCHEMAS"
+        echo "- [$linktext](with-refs/$linktext.html) [(flattened)](resolved/$linktext.html) [(raw)]($linktext.json)" >> "$INDEX_SCHEMAS"
     done
 }
 

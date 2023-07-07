@@ -139,6 +139,7 @@ function render_schemas {
 
     (
         cd "$schemas_dir" || exit 1
+
         echo "Resolving schema references"
         mkdir with-refs resolved
         for i in *.json; do
@@ -146,7 +147,7 @@ function render_schemas {
                 echo "WARNING: Resolving failed: resolved/$i may include \$refs"
                 cp "$i" "resolved/$i"
             fi
-            mv "$i" with-refs/
+            cp "$i" with-refs/
             cp "resolved/$i" "$i"
         done
     )
@@ -155,19 +156,26 @@ function render_schemas {
     for i in "$schemas_dir/with-refs"/*.json; do
         HTML_SCHEMA=${i%%.json}.html
         HTML_SCHEMA_TAIL="with-refs/${HTML_SCHEMA##*/}" # e.g. with-refs/name.html
-        render-json.sh -n "$i" "Schema ${i##*/}" "../${HTML_SCHEMA_TAIL/with-refs/resolved}" "Resolve referenced schemas (may reorder keys)" > "$HTML_SCHEMA"
+        render-json.sh -n "$i" "Schema ${i##*/}" \
+            "../${HTML_SCHEMA_TAIL/with-refs/resolved}" "Resolve referenced schemas (may reorder keys)" \
+            "../${i##*/}" "Show raw JSON" > "$HTML_SCHEMA"
     done
     echo "Rendering resolved schemas"
     for i in "$schemas_dir/resolved"/*.json; do
         HTML_SCHEMA=${i%%.json}.html
         HTML_SCHEMA_TAIL="resolved/${HTML_SCHEMA##*/}" # e.g. resolved/name.html
-        render-json.sh "$i" "Schema ${i##*/}" "../${HTML_SCHEMA_TAIL/resolved/with-refs}" "Show original (referenced schemas with \$ref)" > "$HTML_SCHEMA"
+        render-json.sh "$i" "Schema ${i##*/}" \
+            "../${HTML_SCHEMA_TAIL/resolved/with-refs}" "Show original (referenced schemas with \$ref)" \
+            "../${i##*/}" "Show raw JSON" > "$HTML_SCHEMA"
     done
     echo "Moving schemas"
     mkdir "../$target_dir/$schemas_dir"
     mkdir "../$target_dir/$schemas_dir/with-refs"
     cp ../.scripts/json-formatter.js "../$target_dir/$schemas_dir/with-refs"
     cp -r ../.scripts/codemirror "../$target_dir/$schemas_dir/with-refs"
+    for i in "$schemas_dir/"*.json; do
+        mv "$i" "../$target_dir/$schemas_dir" # raw JSON version
+    done
     for i in "$schemas_dir/with-refs"/*.html; do
         mv "$i" "../$target_dir/$schemas_dir/with-refs"
     done

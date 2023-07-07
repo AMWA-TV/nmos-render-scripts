@@ -34,7 +34,9 @@ function process_file {
     perl -pi -e 's:\.webidl\):.html\):g;' "$1"
 
     # Change .json links to .html and use with-refs for schemas (but not for schema indexes)
-    perl -pi -e 's:\.json\):.html\):g; s:/APIs/schemas/([^)]+):/APIs/schemas/with-refs/$1:g;' "$1"
+    if [ "${1##*/}" != "index.md" ]; then
+        perl -pi -e 's:\.json\):.html\):g; s:/APIs/schemas/([^)]+):/APIs/schemas/with-refs/$1:g;' "$1"
+    fi
 
     # Change %20 escaped spaces in links to underscores. Allow for possible #target-in-page links.
     perl -ni -e '@parts = split /(\(.*?\.md(?:#.*\b)?\))/ ; for ($n = 1; $n < @parts; $n += 2) { $parts[$n] =~ s/%20/_/g; }; print @parts' "$1"
