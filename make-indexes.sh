@@ -187,7 +187,7 @@ function do_classes_index
     for class in "$classes_dir"/*.html; do
         no_ext="${class%%.html}"
         linktext="${no_ext##*/}"
-        name=$(jq -r .name ${no_ext}.json) # meaningful name
+        name=$(jq -r .name "${no_ext}".json) # meaningful name
         echo "- [$linktext](${class##*/}) ($name)" >> "$INDEX_CLASSES"
     done
 }
