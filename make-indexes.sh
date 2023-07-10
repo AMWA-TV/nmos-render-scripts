@@ -321,7 +321,7 @@ if [[ "$AMWA_ID" != "SPECS" ]]; then
 
 ---
 
-The formal specification is provided in [this GitHub repository]($REPO_ADDRESS). These pages render the documentation and APIs (which are specified in RAML and JSON Schema).
+These pages are rendered from the source of the specification, which is in [this GitHub repository]($REPO_ADDRESS).
 
 | Repository | Default Branch | Lint (default) | Render (all) |
 | --- | --- | --- | --- |
