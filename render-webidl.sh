@@ -27,6 +27,8 @@ WEBIDL_FILE=$1
 NAME=$2
 ALT_HREF=$3
 ALT_TEXT=$4
+RAW_HREF=$5
+RAW_TEXT=$6
 
 LINT=: # return true
 
@@ -45,6 +47,14 @@ if [ "$ALT_HREF" ]; then
     cat <<EOF
 <p>
     <a href="$ALT_HREF">$ALT_TEXT</a>
+</p>
+EOF
+fi
+
+if [ "$RAW_HREF" ]; then
+    cat <<EOF
+<p>
+    <a href="$RAW_HREF">$RAW_TEXT</a>
 </p>
 EOF
 fi

@@ -166,24 +166,44 @@ function do_examples_index
         linktext="${no_ext##*/}"
         echo "- [$linktext](${example##*/})" >> "$INDEX_EXAMPLES"
     done
-
 }
 
-function do_idl_index
+function do_models_index
 {
-    set -x
-    idl_dir="$1"
+    models_dir="$1"
 
-    INDEX_IDL="$idl_dir/$INDEX"
-    echo -e "\n### [Web IDL]($idl_dir) $tree_text\n" >> "$INDEX"
-    echo -e "## Web IDL $tree_text\n" > "$INDEX_IDL"
-    for webidl in "$idl_dir"/*.html; do
-        no_ext="${webidl%%.html}"
+    INDEX_MODELS="$models_dir/$INDEX"
+    echo "### [Control class models $tree_text](classes)" > "$INDEX_MODELS"
+    echo "### [Datatype models $tree_text](datatypes)" >> "$INDEX_MODELS"
+}
+
+function do_classes_index
+{
+    classes_dir="$1"
+
+    INDEX_CLASSES="$classes_dir/$INDEX"
+    echo -e "\n### [Control class models]($classes_dir) $tree_text\n" >> "$INDEX"
+    echo -e "## Control class models $tree_text\n" > "$INDEX_CLASSES"
+    for class in "$classes_dir"/*.html; do
+        no_ext="${class%%.html}"
         linktext="${no_ext##*/}"
-        echo "- [$linktext]($webidl)" >> "$INDEX"
-        echo "- [$linktext](${webidl##*/})" >> "$INDEX_IDL"
+        name=$(jq -r .name ${no_ext}.json) # meaningful name
+        echo "- [$linktext](${class##*/}) ($name)" >> "$INDEX_CLASSES"
     done
-    set +x
+}
+
+function do_datatypes_index
+{
+    datatypes_dir="$1"
+
+    INDEX_DATATYPES="$datatypes_dir/$INDEX"
+    echo -e "\n### [Datatype models]($datatypes_dir) $tree_text\n" >> "$INDEX"
+    echo -e "## Datatype models $tree_text\n" > "$INDEX_DATATYPES"
+    for datatype in "$datatypes_dir"/*.html; do
+        no_ext="${datatype%%.html}"
+        linktext="${no_ext##*/}"
+        echo "- [$linktext](${datatype##*/})" >> "$INDEX_DATATYPES"
+    done
 }
 
 function do_tree {
@@ -239,8 +259,10 @@ function do_tree {
                         do_examples_index testingfacade/examples
                     fi
 
-                    if [ -d idl ]; then
-                        do_idl_index idl
+                    if [ -d models ]; then
+                        do_models_index models
+                        do_classes_index models/classes
+                        do_datatypes_index models/datatypes
                     fi
                 fi
             )
@@ -321,7 +343,7 @@ if [[ "$AMWA_ID" != "SPECS" ]]; then
 
 ---
 
-The formal specification is provided in [this GitHub repository]($REPO_ADDRESS). These pages render the documentation and APIs (which are specified in RAML and JSON Schema).
+These pages are rendered from the source of the specification, which is in [this GitHub repository]($REPO_ADDRESS).
 
 | Repository | Default Branch | Lint (default) | Render (all) |
 | --- | --- | --- | --- |
