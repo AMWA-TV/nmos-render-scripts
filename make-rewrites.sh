@@ -2,7 +2,7 @@
 
 set -o errexit
 
-shopt -s nullglob
+shopt -s nullglob globstar
 
 # shellcheck source=get-config.sh
 . .scripts/get-config.sh
@@ -56,7 +56,7 @@ fi
 echo Making repo rewrite rule
 echo "RewriteRule ^repo(.*) $REPO_ADDRESS\$1 [R]" >> $HTACCESS
 
-if compgen -G "*/*/examples/*.sdp" > /dev/null; then
-    echo "Adding Content-Type for SDP examples"
+if compgen -G "**/*.sdp" > /dev/null; then
+    echo "Adding Content-Type for SDP"
     echo "AddType application/sdp .sdp" >> $HTACCESS
 fi
