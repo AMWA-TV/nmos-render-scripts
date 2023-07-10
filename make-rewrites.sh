@@ -55,3 +55,8 @@ fi
 
 echo Making repo rewrite rule
 echo "RewriteRule ^repo(.*) $REPO_ADDRESS\$1 [R]" >> $HTACCESS
+
+if compgen -G "*/*/examples/*.sdp" > /dev/null; then
+    echo "Adding Content-Type for SDP examples"
+    echo "AddType application/sdp .sdp" >> $HTACCESS
+fi
