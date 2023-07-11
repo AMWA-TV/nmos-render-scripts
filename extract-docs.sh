@@ -139,6 +139,7 @@ function render_schemas {
 
     (
         cd "$schemas_dir" || exit 1
+
         echo "Resolving schema references"
         mkdir with-refs resolved
         for i in *.json; do
@@ -146,7 +147,7 @@ function render_schemas {
                 echo "WARNING: Resolving failed: resolved/$i may include \$refs"
                 cp "$i" "resolved/$i"
             fi
-            mv "$i" with-refs/
+            cp "$i" with-refs/
             cp "resolved/$i" "$i"
         done
     )
@@ -155,19 +156,26 @@ function render_schemas {
     for i in "$schemas_dir/with-refs"/*.json; do
         HTML_SCHEMA=${i%%.json}.html
         HTML_SCHEMA_TAIL="with-refs/${HTML_SCHEMA##*/}" # e.g. with-refs/name.html
-        render-json.sh -n "$i" "Schema ${i##*/}" "../${HTML_SCHEMA_TAIL/with-refs/resolved}" "Resolve referenced schemas (may reorder keys)" > "$HTML_SCHEMA"
+        render-json.sh -n "$i" "Schema ${i##*/}" \
+            "../${HTML_SCHEMA_TAIL/with-refs/resolved}" "Resolve referenced schemas (may reorder keys)" \
+            "../${i##*/}" "Get raw JSON" > "$HTML_SCHEMA"
     done
     echo "Rendering resolved schemas"
     for i in "$schemas_dir/resolved"/*.json; do
         HTML_SCHEMA=${i%%.json}.html
         HTML_SCHEMA_TAIL="resolved/${HTML_SCHEMA##*/}" # e.g. resolved/name.html
-        render-json.sh "$i" "Schema ${i##*/}" "../${HTML_SCHEMA_TAIL/resolved/with-refs}" "Show original (referenced schemas with \$ref)" > "$HTML_SCHEMA"
+        render-json.sh "$i" "Schema ${i##*/}" \
+            "../${HTML_SCHEMA_TAIL/resolved/with-refs}" "Show original (referenced schemas with \$ref)" \
+            "../${i##*/}" "Get raw JSON" > "$HTML_SCHEMA"
     done
     echo "Moving schemas"
     mkdir "../$target_dir/$schemas_dir"
     mkdir "../$target_dir/$schemas_dir/with-refs"
     cp ../.scripts/json-formatter.js "../$target_dir/$schemas_dir/with-refs"
     cp -r ../.scripts/codemirror "../$target_dir/$schemas_dir/with-refs"
+    for i in "$schemas_dir/"*.json; do
+        mv "$i" "../$target_dir/$schemas_dir" # raw JSON version
+    done
     for i in "$schemas_dir/with-refs"/*.html; do
         mv "$i" "../$target_dir/$schemas_dir/with-refs"
     done
@@ -186,47 +194,51 @@ function render_schemas {
 
 }
 
-# Render JSON examples in the specified relative path
-function render_examples {
-    examples_dir=$1
+# Render (non-schema) JSON files in the specified relative path
+function render_jsons {
+    json_dir=$1
+    name="$2"
 
-    for i in "$examples_dir"/*.json; do
-        HTML_EXAMPLE=${i%%.json}.html
-        render-json.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
+    for i in "$json_dir"/*.json; do
+        HTML_JSON=${i%%.json}.html
+        render-json.sh -n "$i" "$name ${i##*/}" "" "" "${i##*/}" "Get raw JSON" >> "$HTML_JSON"
     done
 
-    for i in "$examples_dir"/*.sdp; do
-        HTML_EXAMPLE=${i%%.sdp}.html
-        render-other-code.sh -n "$i" "Example ${i##*/}" >> "$HTML_EXAMPLE"
+    echo "Moving $name JSONs"
+    mkdir -p "../$target_dir/$json_dir"
+    for i in "$json_dir"/*.html; do
+        mv "$i" "../$target_dir/$json_dir"
     done
-
-    echo "Moving examples"
-    mkdir -p "../$target_dir/$examples_dir"
-    for i in "$examples_dir"/*.html; do
-        mv "$i" "../$target_dir/$examples_dir"
+    for i in "$json_dir"/*.json; do
+        cp "$i" "../$target_dir/$json_dir"
     done
-    cp ../.scripts/json-formatter.js "../$target_dir/$examples_dir"
-    cp -r ../.scripts/codemirror "../$target_dir/$examples_dir"
+    cp ../.scripts/json-formatter.js "../$target_dir/$json_dir"
+    cp -r ../.scripts/codemirror "../$target_dir/$json_dir"
 
 }
 
-# Render Web IDL in the specified relative path
-function render_webidl {
-    idl_dir=$1
+# Render SDP files in the specified relative path
+function render_sdps {
+    sdp_dir=$1
+    name="$2"
 
-    for i in "$idl_dir"/*.webidl; do
-        HTML_EXAMPLE=${i%%.webidl}.html
-        render-webidl.sh -n "$i" "Framework definitions ${i##*/}" >> "$HTML_EXAMPLE"
+    for i in "$sdp_dir"/*.sdp; do
+        HTML_SDP=${i%%.sdp}.html
+        render-other-code.sh -n "$i" "$name ${i##*/}" "" "" "${i##*/}" "Get raw SDP" >> "$HTML_SDP"
     done
 
-    echo "Moving webidl"
-    mkdir -p "../$target_dir/$idl_dir"
-    for i in "$idl_dir"/*.html; do
-        mv "$i" "../$target_dir/$idl_dir"
+    echo "Moving $name SDPs"
+    mkdir -p "../$target_dir/$sdp_dir"
+    for i in "$sdp_dir"/*.html; do
+        mv "$i" "../$target_dir/$sdp_dir"
     done
-    cp -r ../.scripts/codemirror "../$target_dir/$idl_dir"
+    for i in "$sdp_dir"/*.sdp; do
+        cp "$i" "../$target_dir/$sdp_dir"
+    done
+    cp -r ../.scripts/codemirror "../$target_dir/$sdp_dir"
 
 }
+
 
 function extract_and_render {
     checkout=$1
@@ -295,15 +307,20 @@ function extract_and_render {
             fi 
 
             if [ -d examples ]; then
-                render_examples examples
+                render_jsons examples Example
+                render_sdps examples Example
             fi
 
             if [ -d testingfacade/examples ]; then
-                render_examples testingfacade/examples
+                render_jsons testingfacade/examples Example
             fi
 
-            if [ -d idl ]; then
-                render_webidl idl
+            if [ -d models/classes ]; then
+                render_jsons models/classes "Control class"
+            fi
+
+            if [ -d models/datatypes ]; then
+                render_jsons models/datatypes Datatype
             fi
         fi # AMWA_ID
     )
