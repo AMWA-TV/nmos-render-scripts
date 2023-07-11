@@ -184,7 +184,7 @@ function do_classes_index
     INDEX_CLASSES="$classes_dir/$INDEX"
     echo -e "\n### [Control class models]($classes_dir) $tree_text\n" >> "$INDEX"
     echo -e "## Control class models $tree_text\n" > "$INDEX_CLASSES"
-    for class in "$classes_dir"/*.html; do
+    for class in $(compgen -G "$classes_dir"/\*.html | sort -V); do
         no_ext="${class%%.html}"
         linktext="${no_ext##*/}"
         name=$(jq -r .name "${no_ext}".json) # meaningful name
