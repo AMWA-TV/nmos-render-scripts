@@ -62,7 +62,7 @@ function add_docs_from_markdown_list_of_links {
 
     # append index links with docs/
     perl -p -e 's~\]\(~\]\(docs/~' "$list" >> "$INDEX"
-    perl -p -e 's~\]\(~\]\(docs/~' "$list" >> "$INDEX_DOCS"
+    grep '](' "$list" >> "$INDEX_DOCS"
 }
 
 function add_numbered_doc {
