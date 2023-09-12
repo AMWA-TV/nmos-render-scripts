@@ -46,10 +46,10 @@ if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS-PARAMETER-REGISTERS" ]]; then
 	wget -O- -q https://specs.amwa.tv/nmos-parameter-registers/registers.json > _data/registers.json
 fi
 
-# if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS-CONTROL-FEATURE-SETS" ]]; then
-# 	echo Getting feature_sets.json
-# 	wget -O- -q https://specs.amwa.tv/nmos-control-feature-sets/feature_sets.json > _data/feature_sets.json
-# fi
+if [[ "$AMWA_ID" != "SPECS" && "$AMWA_ID" != "NMOS-CONTROL-FEATURE-SETS" ]]; then
+	echo Getting feature_sets.json
+	wget -O- -q https://specs.amwa.tv/nmos-control-feature-sets/feature_sets.json > _data/feature_sets.json
+fi
 
 # TODO: sort what substitutions are really needed in the long jq line
 if [[ -d "$DEFAULT_TREE/docs" ]]; then
