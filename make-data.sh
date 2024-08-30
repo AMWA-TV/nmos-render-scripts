@@ -18,7 +18,7 @@ echo Creating _data files
 
 [[ ! -d _data ]] && mkdir _data
 
-for i in spec spec_list registers feature_sets; do
+for i in spec spec_list registers feature_sets themes; do
     if [[ -f "../$i.yml" ]]; then
             echo Making "$i.json"
             yaml2json "../$i.yml" > "_data/$i.json"
