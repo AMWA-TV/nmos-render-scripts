@@ -1,15 +1,25 @@
 #!/usr/bin/env bash
-
 set -o errexit
 
-CONCAT=/tmp/concat.json
-rm -f "$CONCAT"
+TMP=$(mktemp -d -t make-specs-json)
 
-echo "Getting spec info: "
+echo "Getting themes"
+themes=$(yaml2json ../themes.yml)
+
+echo "Getting spec info"
 for id in $(yaml2json ../spec_list.yml | jq -r '.[]'); do
-	echo "$id"
-	wget -O- -q "https://specs.amwa.tv/${id,,}/spec.json" >> "$CONCAT"
+    echo "$id"
+    # themes for this id to mix in
+    id_themes=$(echo $themes | jq "[ .[] | select(.members[] == \"$id\").name ]")
+    wget -O- -q "https://specs.amwa.tv/${id,,}/spec.json" | jq ".themes = $id_themes" >> "$TMP/specs"
 done
 echo
 
-jq --slurp . "$CONCAT" > _data/specs.json
+echo "Making specs.json"
+jq --slurp . "$TMP/specs" > _data/specs.json
+# echo "Making specs-by-theme.json"
+# for theme in $(yaml2json ../themes.yml | jq -r '.[]'); do
+#     echo "$theme"
+# done
+
+rm -r "$TMP"
