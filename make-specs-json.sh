@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -o errexit
 
-TMP=$(mktemp -d -t make-specs-json)
+TMP=$(mktemp -d -t make-specs-jsonXXXXXX)
 
 echo "Getting themes"
 themes=$(yaml2json ../themes.yml)
