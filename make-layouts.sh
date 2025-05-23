@@ -8,6 +8,14 @@ shopt -s nullglob
 
 echo Setting up layouts
 
+# Load environment variables from .env (if present)
+# shellcheck disable=SC1091
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+fi
+
 if [[ -d .layouts ]]; then
 	echo "Warning: .layouts exists so not cloning"
 else

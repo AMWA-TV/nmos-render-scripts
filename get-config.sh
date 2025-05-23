@@ -6,6 +6,14 @@
 # It now pulls in settings from _config.yml
 # TODO: just read _config.yml once!
 
+# Load environment variables from .env (if present)
+# shellcheck disable=SC1091
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+fi
+
 if [[ "$CONFIG" ]]; then
     echo "Warning: Using config from $CONFIG rather than _config.yml"
     _CONFIG_YML="$CONFIG"
